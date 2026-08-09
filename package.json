@@ -30,7 +30,6 @@
   "homepage": "https://github.com/HannyOM/flask-production-blog-app#readme",
   "devDependencies": {
     "autoprefixer": "^10.4.27",
-    "flowbite": "^2.5.2",
     "postcss": "^8.5.8",
     "tailwindcss": "^3.4.17",
     "vite": "^5.4.21"

@@ -1,0 +1,13 @@
+{% macro btn(label, variant="primary", href=None, class="") %}
+  {% set base = {
+    "primary": "bg-mint text-black rounded-[24px] px-6 py-2.5 text-sm font-medium hover:brightness-90 active:brightness-75 transition-colors",
+    "secondary": "bg-surface2 text-ink border border-line rounded-[24px] px-6 py-2.5 text-sm font-medium hover:brightness-95 active:brightness-90 transition-colors",
+    "outline": "border border-mint text-accent rounded-[40px] px-6 py-2.5 text-sm font-medium hover:bg-mint hover:text-black transition-colors",
+    "uv": "bg-uv text-white rounded-[24px] px-6 py-2.5 text-sm font-medium hover:bg-uvrule transition-colors",
+  }[variant] %}
+  {% if href %}
+  <a href="{{ href }}" class="{{ base }} {{ class }}" {{ kwargs|xmlattr }}>{{ label }}</a>
+  {% else %}
+  <button class="{{ base }} {{ class }}" {{ kwargs|xmlattr }}>{{ label }}</button>
+  {% endif %}
+{% endmacro %}

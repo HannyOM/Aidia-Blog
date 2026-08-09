@@ -1,0 +1,92 @@
+{% from "components/buttons.html" import btn %}
+
+{% macro nav_link(label, href, active, key) %}
+<a href="{{ href }}"
+    class="font-mono text-[11px] uppercase tracking-[1.8px] transition-colors {{ 'text-accent shadow-[inset_0_-1px_0_0_var(--accent)]' if active == key else 'text-ink2 hover:text-accent' }}">{{ label }}</a>
+{% endmacro %}
+
+{% macro navbar(active='') %}
+<nav class="sticky top-0 z-50 border-b border-line bg-canvas">
+    <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="flex items-center justify-between h-16">
+            <a href="{{ url_for('blog.index') }}" class="font-display text-2xl tracking-tight text-ink hover:text-accent transition-colors">
+                AIDIA
+            </a>
+
+            <div class="hidden md:flex items-center gap-7">
+                {{ nav_link('Home', url_for('blog.index'), active, 'home') }}
+                {{ nav_link('Articles', url_for('blog.articles'), active, 'articles') }}
+
+                <form action="{{ url_for('blog.search') }}" method="get" class="flex items-center">
+                    <input type="text" name="q" placeholder="SEARCH"
+                        class="w-28 lg:w-36 bg-transparent border border-line rounded-[2px] px-3 py-1.5 font-mono text-xs text-ink placeholder:text-ink2 focus:outline-none focus:border-mint transition-colors">
+                    <button type="submit" class="ml-1 p-1.5 text-ink2 hover:text-accent transition-colors" aria-label="Search">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <button type="button" class="theme-toggle p-2 text-ink2 hover:text-accent transition-colors" aria-label="Toggle theme">
+                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                </button>
+
+                {% if user.is_authenticated %}
+                {{ btn("New Post", variant="primary", href=url_for('blog.new'), class="px-5 py-2") }}
+                {% else %}
+                {{ btn("Login", variant="primary", href=url_for('security.login'), class="px-5 py-2") }}
+                {% endif %}
+            </div>
+
+            <div class="flex md:hidden items-center gap-1">
+                <button type="button" class="theme-toggle p-2 text-ink2 hover:text-accent transition-colors" aria-label="Toggle theme">
+                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                </button>
+                <button type="button" class="p-2 text-ink2 hover:text-accent transition-colors" data-menu-toggle data-target="mobile-menu" aria-label="Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden md:hidden" id="mobile-menu">
+        <div class="px-6 pb-6 pt-2 space-y-1 border-t border-line">
+            <form action="{{ url_for('blog.search') }}" method="get" class="flex items-center px-2 py-2">
+                <input type="text" name="q" placeholder="SEARCH"
+                    class="w-full bg-transparent border border-line rounded-[2px] px-3 py-2 font-mono text-xs text-ink placeholder:text-ink2 focus:outline-none focus:border-mint">
+            </form>
+            <a href="{{ url_for('blog.index') }}"
+                class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] {{ 'text-accent' if active == 'home' else 'text-ink2 hover:text-accent' }} transition-colors">Home</a>
+            <a href="{{ url_for('blog.articles') }}"
+                class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] {{ 'text-accent' if active == 'articles' else 'text-ink2 hover:text-accent' }} transition-colors">Articles</a>
+            {% if user.is_authenticated %}
+            <a href="{{ url_for('blog.new') }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">New Post</a>
+            <a href="{{ url_for('blog.profile', username=user.username) }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">Profile</a>
+            <a href="{{ url_for('security.logout') }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">Logout</a>
+            {% else %}
+            <a href="{{ url_for('security.login') }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">Login</a>
+            <a href="{{ url_for('security.register') }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">Register</a>
+            {% endif %}
+            <div class="pt-3">
+                {% if user.is_authenticated %}
+                {{ btn("New Post", variant="primary", href=url_for('blog.new'), class="w-full") }}
+                {% else %}
+                {{ btn("Login", variant="primary", href=url_for('security.login'), class="w-full") }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+{% endmacro %}

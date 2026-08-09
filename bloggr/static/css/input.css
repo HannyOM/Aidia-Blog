@@ -3,39 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --canvas: #faf9f7;
-    --surface: #ffffff;
-    --surface2: #f0efec;
-    --imageframe: #e0dfdc;
-    --ink: #131313;
-    --ink2: #4b4b4b;
-    --ink3: #6e6e6e;
-    --line: #e0e0de;
-    --accent: #309875;
-  }
-
-  .dark {
-    --canvas: #131313;
-    --surface: #2d2d2d;
-    --surface2: #222222;
-    --imageframe: #313131;
-    --ink: #ffffff;
-    --ink2: #949494;
-    --ink3: #e9e9e9;
-    --line: rgba(255, 255, 255, 0.10);
-    --accent: #3cffd0;
-  }
-
-  html {
-    background-color: var(--canvas);
-    color: var(--ink);
-  }
-
   body {
-    font-family: "Space Grotesk", Helvetica, Arial, sans-serif;
-    background-color: var(--canvas);
-    color: var(--ink);
-    -webkit-font-smoothing: antialiased;
+    font-family: "Source Serif 4", Georgia, Cambria, "Times New Roman", serif;
   }
 }

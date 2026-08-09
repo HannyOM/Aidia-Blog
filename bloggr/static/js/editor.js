@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Link.configure({
           openOnClick: false,
           HTMLAttributes: {
-            class: "text-accent underline",
+            class: "text-blue-600 underline",
           },
         }),
         TextAlign.configure({
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       content: hiddenInput?.value || "",
       editorProps: {
         attributes: {
-          class: "prose prose-sm sm:prose lg:prose-lg max-w-none dark:prose-invert focus:outline-none",
+          class: "prose prose-sm sm:prose lg:prose-lg max-w-none focus:outline-none",
         },
       },
       onUpdate: ({ editor }) => {

@@ -296,3 +296,130 @@ def test_search_only_finds_published_posts(client, create_user, auth, app):
     response = client.get("/search?q=content")
     assert b"Public Post" in response.data
     assert b"Secret Draft" not in response.data
+
+
+# Message author tests
+def test_profile_shows_message_button_for_visitor(client, create_user, create_user2, auth):
+    username, password, user, email, fs_uniquifier = create_user
+    username2, password2, user2, email2, fs_uniquifier2 = create_user2
+    auth.login()
+    response = client.get(f"/profile/{username2}")
+    assert response.status_code == 200
+    assert b">Message</button>" in response.data
+
+
+def test_profile_hides_message_button_for_owner(client, create_user, auth):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    response = client.get(f"/profile/{username}")
+    assert response.status_code == 200
+    assert b">Message</button>" not in response.data
+
+
+def test_message_route_rejects_get(client, create_user, auth):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    response = client.get(f"/message/{username}")
+    assert response.status_code == 405
+
+
+def test_message_route_unknown_user_404(client, create_user, auth, monkeypatch):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    sent = []
+    monkeypatch.setattr("bloggr.blog.email_service.send_email", lambda **kw: sent.append(kw))
+    response = client.post("/message/nonexistent_user", data={
+        "sender_name": "Jane Doe",
+        "sender_email": "jane@example.com",
+        "subject": "Hi",
+        "message": "Hello",
+    })
+    assert response.status_code == 404
+    assert sent == []
+
+
+def test_message_sends_email_to_author(client, create_user, auth, monkeypatch):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    sent = []
+    monkeypatch.setattr("bloggr.blog.email_service.send_email", lambda **kw: sent.append(kw))
+    response = client.post(f"/message/{username}", data={
+        "sender_name": "Jane Doe",
+        "sender_email": "jane@example.com",
+        "subject": "Question about your post",
+        "message": "Loved your article!",
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Your message has been sent." in response.data
+    assert len(sent) == 1
+    payload = sent[0]
+    assert payload["to"] == [email]
+    assert payload["reply_to"] == ["jane@example.com"]
+    assert "Question about your post" in payload["subject"]
+    assert "Jane Doe" in payload["html"]
+    assert "Loved your article!" in payload["html"]
+
+
+def test_message_requires_name(client, create_user, auth, monkeypatch):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    sent = []
+    monkeypatch.setattr("bloggr.blog.email_service.send_email", lambda **kw: sent.append(kw))
+    response = client.post(f"/message/{username}", data={
+        "sender_name": "",
+        "sender_email": "jane@example.com",
+        "subject": "Hi",
+        "message": "Hello",
+    })
+    assert response.status_code == 400
+    assert b"Your name is required." in response.data
+    assert sent == []
+
+
+def test_message_requires_valid_email(client, create_user, auth, monkeypatch):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    sent = []
+    monkeypatch.setattr("bloggr.blog.email_service.send_email", lambda **kw: sent.append(kw))
+    response = client.post(f"/message/{username}", data={
+        "sender_name": "Jane Doe",
+        "sender_email": "not-an-email",
+        "subject": "Hi",
+        "message": "Hello",
+    })
+    assert response.status_code == 400
+    assert b"Please enter a valid email address." in response.data
+    assert sent == []
+
+
+def test_message_requires_message(client, create_user, auth, monkeypatch):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    sent = []
+    monkeypatch.setattr("bloggr.blog.email_service.send_email", lambda **kw: sent.append(kw))
+    response = client.post(f"/message/{username}", data={
+        "sender_name": "Jane Doe",
+        "sender_email": "jane@example.com",
+        "subject": "Hi",
+        "message": "",
+    })
+    assert response.status_code == 400
+    assert b"Message is required." in response.data
+    assert sent == []
+
+
+def test_message_honeypot_blocks_send(client, create_user, auth, monkeypatch):
+    username, password, user, email, fs_uniquifier = create_user
+    auth.login()
+    sent = []
+    monkeypatch.setattr("bloggr.blog.email_service.send_email", lambda **kw: sent.append(kw))
+    response = client.post(f"/message/{username}", data={
+        "sender_name": "Jane Doe",
+        "sender_email": "jane@example.com",
+        "subject": "Hi",
+        "message": "Hello",
+        "website": "spambot-value",
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Your message has been sent." in response.data
+    assert sent == []

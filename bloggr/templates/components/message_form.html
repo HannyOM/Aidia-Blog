@@ -1,0 +1,78 @@
+{% macro message_modal(form, author_username, show=False) %}
+<div id="message-modal" class="fixed inset-0 z-50 items-center justify-center p-4 {% if show %}flex{% else %}hidden{% endif %}">
+    <div class="absolute inset-0 bg-black/50" data-message-modal-close></div>
+    <div class="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-surface border border-line rounded-verge p-6 md:p-8">
+        <div class="flex items-start justify-between mb-6">
+            <div>
+                <p class="font-mono text-xs uppercase tracking-[1.8px] text-accent mb-3">Contact</p>
+                <h2 class="font-sans text-2xl font-bold text-ink">Message {{ author_username }}</h2>
+                <p class="mt-1 text-sm text-ink2">This will be sent to their email address.</p>
+            </div>
+            <button type="button" data-message-modal-close
+                class="shrink-0 w-9 h-9 rounded-full bg-surface2 border border-line flex items-center justify-center text-ink2 hover:text-linkblue transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('blog.message', username=author_username) }}" class="space-y-5">
+            {{ form.csrf_token }}
+            <input type="text" name="website" id="website" class="hidden" tabindex="-1" autocomplete="off">
+
+            <div>
+                <label for="sender_name" class="block text-sm font-medium text-ink2 mb-2">Your Name</label>
+                <input type="text" name="sender_name" id="sender_name" placeholder="Jane Doe"
+                    value="{{ request.form.get('sender_name', '') }}"
+                    class="w-full px-4 py-3 border {{ 'border-uv ' if form.errors.get('sender_name') }}border-line rounded-[2px] bg-transparent text-ink placeholder:text-ink2 focus:outline-none {{ 'focus:border-uv ' if form.errors.get('sender_name') }}focus:border-mint transition-colors"
+                    required>
+                {% if form.errors.get('sender_name') %}
+                <p class="mt-1 font-mono text-[11px] uppercase tracking-[1.2px] text-uv">{{ form.errors.get('sender_name')[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="sender_email" class="block text-sm font-medium text-ink2 mb-2">Your Email</label>
+                <input type="email" name="sender_email" id="sender_email" placeholder="jane@example.com"
+                    value="{{ request.form.get('sender_email', '') }}"
+                    class="w-full px-4 py-3 border {{ 'border-uv ' if form.errors.get('sender_email') }}border-line rounded-[2px] bg-transparent text-ink placeholder:text-ink2 focus:outline-none {{ 'focus:border-uv ' if form.errors.get('sender_email') }}focus:border-mint transition-colors"
+                    required>
+                {% if form.errors.get('sender_email') %}
+                <p class="mt-1 font-mono text-[11px] uppercase tracking-[1.2px] text-uv">{{ form.errors.get('sender_email')[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="subject" class="block text-sm font-medium text-ink2 mb-2">Subject <span class="text-ink3">(optional)</span></label>
+                <input type="text" name="subject" id="subject" placeholder="What's this about?"
+                    value="{{ request.form.get('subject', '') }}"
+                    class="w-full px-4 py-3 border {{ 'border-uv ' if form.errors.get('subject') }}border-line rounded-[2px] bg-transparent text-ink placeholder:text-ink2 focus:outline-none {{ 'focus:border-uv ' if form.errors.get('subject') }}focus:border-mint transition-colors">
+                {% if form.errors.get('subject') %}
+                <p class="mt-1 font-mono text-[11px] uppercase tracking-[1.2px] text-uv">{{ form.errors.get('subject')[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="message" class="block text-sm font-medium text-ink2 mb-2">Message</label>
+                <textarea name="message" id="message" rows="5" placeholder="Write your message..."
+                    class="w-full px-4 py-3 border {{ 'border-uv ' if form.errors.get('message') }}border-line rounded-[2px] bg-transparent text-ink placeholder:text-ink2 focus:outline-none {{ 'focus:border-uv ' if form.errors.get('message') }}focus:border-mint transition-colors resize-y"
+                    required>{{ request.form.get('message', '') }}</textarea>
+                {% if form.errors.get('message') %}
+                <p class="mt-1 font-mono text-[11px] uppercase tracking-[1.2px] text-uv">{{ form.errors.get('message')[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center justify-end space-x-4 pt-2">
+                <button type="button" data-message-modal-close
+                    class="bg-surface2 text-ink border border-line rounded-[24px] px-6 py-2.5 text-sm font-medium hover:brightness-95 active:brightness-90 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="bg-mint text-black rounded-[24px] px-6 py-2.5 text-sm font-medium hover:brightness-90 active:brightness-75 transition-colors">
+                    Send Message
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endmacro %}

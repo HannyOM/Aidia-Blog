@@ -3,6 +3,7 @@
 {% from "components/footer.html" import footer %}
 {% from "components/badges.html" import pill %}
 {% from "components/buttons.html" import btn %}
+{% from "components/message_form.html" import message_modal %}
 
 {% block title %}{{ profile_user.username }} - Profile - AIDIA{% endblock %}
 
@@ -29,6 +30,10 @@
                     <div class="mt-4">
                         {{ btn("Edit Profile", variant="primary", href=url_for('blog.edit_profile')) }}
                     </div>
+                    {% else %}
+                    <div class="mt-4">
+                        {{ btn("Message", variant="outline", data_message_modal_open="") }}
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -37,6 +42,12 @@
 
     <!-- User's Posts -->
     <main class="max-w-4xl mx-auto px-6 md:px-12 py-12 w-full flex-1">
+        {% for message in get_flashed_messages() %}
+        <div class="bg-uv/10 border border-uv/40 text-ink px-4 py-3 rounded-[2px] mb-6">
+            {{ message }}
+        </div>
+        {% endfor %}
+
         <div class="flex items-center justify-between mb-8">
             <h2 class="font-sans text-2xl font-bold text-ink">Posts by {{ profile_user.username }}</h2>
             <span class="font-mono text-xs uppercase tracking-[1.5px] text-ink2">{{ posts|length }} article{{ "s" if posts|length != 1 else "" }}</span>
@@ -142,6 +153,37 @@
         {% endif %}
     </main>
 
+    {{ message_modal(message_form, profile_user.username, show_message_modal|default(False)) }}
+
     {{ footer() }}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('message-modal');
+    if (!modal) return;
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        const nameField = document.getElementById('sender_name');
+        if (nameField) nameField.focus();
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    document.querySelectorAll('[data-message-modal-open]').forEach(function(btn) {
+        btn.addEventListener('click', openModal);
+    });
+    document.querySelectorAll('[data-message-modal-close]').forEach(function(btn) {
+        btn.addEventListener('click', closeModal);
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+});
+</script>
 {% endblock %}

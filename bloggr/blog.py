@@ -1,12 +1,30 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify
-from .models import Post
+from datetime import date
+import html
+
+from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify, current_app
+from flask_wtf import FlaskForm
+from wtforms import StringField, TextAreaField
+from wtforms.validators import DataRequired, Email, Length, Optional
 from flask_security.decorators import auth_required, roles_accepted
 from flask_login import current_user
+
 from . import db
-from datetime import date
+from .models import Post
+from .email_service import email_service
 
 
 bp = Blueprint("blog", __name__)
+
+
+class MessageForm(FlaskForm):
+    sender_name = StringField("Your Name", validators=[DataRequired(message="Your name is required.")])
+    sender_email = StringField(
+        "Your Email",
+        validators=[DataRequired(message="Your email is required."), Email(message="Please enter a valid email address.")],
+    )
+    subject = StringField("Subject", validators=[Optional(), Length(max=100, message="Subject is too long (max 100 characters).")])
+    message = TextAreaField("Message", validators=[DataRequired(message="Message is required.")])
+    website = StringField("Website")  # Honeypot to deter spam.
 
 
 @bp.route("/")
@@ -131,6 +149,12 @@ def delete(post_id):
 
 @bp.route("/profile/<username>")
 def profile(username):
+    context = _get_profile_context(username)
+    context["message_form"] = MessageForm()
+    return render_template("blog/profile.html", **context)
+
+
+def _get_profile_context(username):
     from .models import User
     profile_user = User.query.filter_by(username=username).first_or_404()
     published_posts = Post.query.filter_by(author_id=profile_user.id, is_published=True).all()
@@ -139,7 +163,61 @@ def profile(username):
         draft_posts = Post.query.filter_by(author_id=profile_user.id, is_published=False).all()
     else:
         draft_posts = []
-    return render_template("blog/profile.html", profile_user=profile_user, posts=published_posts, drafts=draft_posts, is_owner=is_owner)
+    return {
+        "profile_user": profile_user,
+        "posts": published_posts,
+        "drafts": draft_posts,
+        "is_owner": is_owner,
+    }
+
+
+@bp.route("/message/<username>", methods=["POST"])
+def message(username):
+    from .models import User
+    author = User.query.filter_by(username=username).first_or_404()
+    form = MessageForm()
+
+    if not form.validate_on_submit():
+        context = _get_profile_context(username)
+        return render_template(
+            "blog/profile.html",
+            message_form=form,
+            show_message_modal=True,
+            **context,
+        ), 400
+
+    # Honeypot filled -> silently accept without sending an email.
+    if form.website.data:
+        flash("Your message has been sent.", "success")
+        return redirect(url_for("blog.profile", username=username))
+
+    sender_name = form.sender_name.data.strip()
+    sender_email = form.sender_email.data.strip()
+    subject = form.subject.data.strip() or "New message"
+    body = form.message.data.strip()
+
+    html_body = (
+        f"<p><strong>From:</strong> {html.escape(sender_name)} "
+        f"&lt;<a href=\"mailto:{html.escape(sender_email)}\">{html.escape(sender_email)}</a>&gt;</p>"
+        f"<p><strong>Subject:</strong> {html.escape(subject)}</p>"
+        f"<hr><p>{html.escape(body).replace(chr(10), '<br>')}</p>"
+    )
+    text_body = f"From: {sender_name} <{sender_email}>\nSubject: {subject}\n\n{body}"
+
+    try:
+        email_service.send_email(
+            to=[author.email],
+            subject=f"[AIDIA] {subject} from {sender_name}",
+            html=html_body,
+            text=text_body,
+            reply_to=[sender_email],
+        )
+        flash("Your message has been sent.", "success")
+    except Exception:
+        current_app.logger.exception("Failed to send message to %s", author.email)
+        flash("Your message could not be sent. Please try again later.", "error")
+
+    return redirect(url_for("blog.profile", username=username))
 
 
 @bp.route("/profile/edit", methods=["GET", "POST"])

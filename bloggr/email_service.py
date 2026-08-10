@@ -20,6 +20,7 @@ class ResendEmailService:
         html: str,
         text: str | None = None,
         from_email: str | None = None,
+        reply_to: List[str] | None = None,
     ):
         params: resend.Emails.SendParams = {
             "from": from_email or self.from_email,
@@ -29,6 +30,8 @@ class ResendEmailService:
         }
         if text:
             params["text"] = text
+        if reply_to:
+            params["reply_to"] = reply_to
 
         return resend.Emails.send(params)
 

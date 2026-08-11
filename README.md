@@ -1,6 +1,6 @@
 # AIDIA - Flask Production Blog App
 
-A production-ready blog application built with Flask, featuring a rich text editor, role-based access control, user authentication, and a responsive UI.
+AIDIA is a production-ready blog application. It is built with Flask. It provides a rich text editor, role-based access control, user authentication, and a responsive UI.
 
 ![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-3.1+-green.svg)
@@ -9,16 +9,16 @@ A production-ready blog application built with Flask, featuring a rich text edit
 
 ## Features
 
-- **Blog Publishing** — Create, edit, delete, and view blog posts with a WYSIWYG rich text editor
-- **Draft/Publish Workflow** — Posts default to draft status; publish when ready
-- **User Authentication** — Registration, login, and email confirmation via Flask-Security
-- **Role-Based Access Control** — Automatic "editor" role assignment; admin/editor permissions for content management
-- **Author Ownership** — Only post authors can edit or delete their own posts
-- **User Profiles** — Public profile pages with post history and draft visibility (owner-only)
-- **Full-Text Search** — Search across published post titles and content
-- **Rich Text Editor** — TipTap-powered editor with bold, italic, underline, headings, lists, blockquotes, links, code, and more
-- **Responsive UI** — Mobile-friendly design built with Tailwind CSS and Flowbite
-- **Health Check** — Built-in `/health` endpoint for monitoring database connectivity
+- **Blog Publishing** — Create blog posts with a WYSIWYG rich text editor. Edit, delete, and view posts.
+- **Draft/Publish Workflow** — New posts have draft status. Publish a post when it is ready.
+- **User Authentication** — Users can register, log in, and confirm their email. Flask-Security handles authentication.
+- **Role-Based Access Control** — Each new user receives the "editor" role automatically. Admins and editors can manage content.
+- **Author Ownership** — Only the author can edit or delete a post.
+- **User Profiles** — Each user has a public profile page. The page shows the user's post history. Drafts are visible only to the profile owner.
+- **Full-Text Search** — Users can search published post titles and content.
+- **Rich Text Editor** — The TipTap editor provides bold, italic, underline, headings, lists, blockquotes, links, code, and other formats.
+- **Responsive UI** — The design works on mobile devices. It uses Tailwind CSS and Flowbite.
+- **Health Check** — The `/health` endpoint reports database connectivity.
 
 ## Tech Stack
 
@@ -27,7 +27,7 @@ A production-ready blog application built with Flask, featuring a rich text edit
 | Technology | Purpose |
 |------------|---------|
 | Flask 3.1+ | Web framework |
-| Flask-Security 5.7 | Authentication & authorization |
+| Flask-Security 5.7 | Authentication and authorization |
 | Flask-SQLAlchemy 3.1 | ORM database layer |
 | Flask-Migrate 4.1 | Database migrations (Alembic) |
 | Flask-WTF 1.2 | Form handling with CSRF protection |
@@ -145,7 +145,7 @@ flask-production-blog-app/
    flask run
    ```
 
-   The application will be available at `http://localhost:5000`.
+   The application is available at `http://localhost:5000`.
 
 ## Configuration
 
@@ -159,43 +159,43 @@ flask-production-blog-app/
 | `SECURITY_PASSWORD_SALT` | Yes | Argon2 password hashing salt |
 | `RESEND_API_KEY` | Yes | Resend.com API key for emails |
 | `RESEND_FROM_EMAIL` | Yes | Verified sender email address |
-| `PORT` | No | Port for production server (default: 8080) |
+| `PORT` | No | Port for the production server (default: 8080) |
 
 ### Configuration Classes
 
-The app uses environment-based configuration switching:
+The app selects its configuration class from the environment:
 
-- **DevelopmentConfig** — Debug mode enabled, relaxed cookie security
-- **ProductionConfig** — Debug disabled, secure cookies, same-site lax policy
+- **DevelopmentConfig** — Debug mode is enabled. Cookie security is relaxed.
+- **ProductionConfig** — Debug mode is disabled. Cookies use secure settings. Same-site policy is lax.
 
 ## Usage
 
 ### User Roles
 
-- **Anonymous users** — Can browse published articles, search, and view public profiles
-- **Registered users** — Automatically assigned "editor" role upon registration
-- **Editors** — Can create, edit, and delete their own posts
-- **Admins** — Full access to all content management features
+- **Anonymous users** — Can browse published articles, search, and view public profiles.
+- **Registered users** — Receive the "editor" role when they register.
+- **Editors** — Can create, edit, and delete their own posts.
+- **Admins** — Can use all content management features.
 
 ### Creating Posts
 
-1. Log in to your account
-2. Navigate to `/new` or click "New Post" in the navigation
-3. Use the TipTap rich text editor to compose your post
-4. Optionally check "Publish immediately" to make the post public
-5. Click "Add Post" to save
+1. Log in to your account.
+2. Navigate to `/new`. Or click "New Post" in the navigation.
+3. Use the TipTap rich text editor to compose the post.
+4. Check "Publish immediately" to make the post public. This step is optional.
+5. Click "Add Post" to save the post.
 
 Unpublished posts are visible only to their author.
 
 ### User Profiles
 
-- Public profiles are accessible at `/profile/<username>`
-- Shows user info, published posts, and drafts (visible only to the profile owner)
-- Edit your profile at `/profile/edit`
+- Public profiles are at `/profile/<username>`.
+- The profile shows user information and published posts. It shows drafts only to the profile owner.
+- Edit the profile at `/profile/edit`.
 
 ## Testing
 
-The test suite uses Docker-based PostgreSQL via testcontainers for isolation.
+The tests use PostgreSQL from Docker. The testcontainers library provides the database. Each test run is isolated from other runs.
 
 ### Run all tests
 
@@ -209,13 +209,13 @@ pytest
 pytest -v
 ```
 
-### Run specific test file
+### Run a specific test file
 
 ```bash
 pytest tests/test_blog.py
 ```
 
-### Run specific test function
+### Run a specific test function
 
 ```bash
 pytest tests/test_blog.py::test_index
@@ -234,7 +234,7 @@ pytest -k "test_login"
 | `client` | Flask test client for HTTP requests |
 | `app` | Flask application instance |
 | `db` | SQLAlchemy database instance |
-| `create_user` | Creates and returns a test user with "editor" role |
+| `create_user` | Creates and returns a test user with the "editor" role |
 | `auth` | Helper with `.login()` and `.logout()` methods |
 
 ## Database Migrations
@@ -251,7 +251,7 @@ flask db migrate -m "description of changes"
 flask db upgrade
 ```
 
-### Rollback last migration
+### Roll back the last migration
 
 ```bash
 flask db downgrade
@@ -269,14 +269,15 @@ docker run -p 8080:8080 --env-file .env aidia-blog
 ```
 
 The Docker image includes:
-- Python 3.12-slim base
-- Node.js 20.x for frontend asset building
-- Automatic migration execution on startup
-- Gunicorn with 4 workers and 120s timeout
+
+- Uses the Python 3.12-slim base image.
+- Uses Node.js 20.x to build frontend assets.
+- Runs database migrations when the app starts.
+- Runs Gunicorn with 4 workers and a 120-second timeout.
 
 ### Railway
 
-Deploy with one click using the included `railway.json` configuration.
+Use the included `railway.json` file. It deploys the app with one click.
 
 ### Heroku / Render
 
@@ -289,12 +290,12 @@ web: gunicorn --bind 0.0.0.0:$PORT wsgi:app
 
 ### CI/CD Pipeline
 
-The GitHub Actions workflow (`.github/workflows/ci-cd.yml`) provides:
+The GitHub Actions workflow is at `.github/workflows/ci-cd.yml`. It provides:
 
-1. **Test** — Runs pytest against PostgreSQL 16 service container
-2. **Build** — Builds Docker image with Trivy security scanning (HIGH/CRITICAL thresholds)
-3. **Deploy** — Deploys to Railway via CLI with health check verification
-4. **Backup** — Automated PostgreSQL backups using `pg_dump` + gzip (7-day retention)
+1. **Test** — Runs pytest against a PostgreSQL 16 service container.
+2. **Build** — Builds a Docker image. Trivy scans the image for HIGH and CRITICAL vulnerabilities.
+3. **Deploy** — Deploys to Railway with the Railway CLI. Verifies the deployment with a health check.
+4. **Backup** — Backs up PostgreSQL with `pg_dump` and gzip. Keeps backups for 7 days.
 
 ## API Reference
 
@@ -331,17 +332,17 @@ Returns public user information:
 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
-| GET | `/` | No | Homepage with featured post and latest articles |
-| GET | `/post/<post_id>` | No | View single post |
+| GET | `/` | No | Homepage with a featured post and latest articles |
+| GET | `/post/<post_id>` | No | View a single post |
 | GET | `/articles` | No | All published articles |
 | GET | `/search?q=<query>` | No | Search published posts |
 | GET | `/new` | Yes | New post form |
-| POST | `/add` | Yes | Create new post |
-| GET | `/edit/<post_id>` | Yes | Edit post (author only) |
-| POST | `/save/<post_id>` | Yes | Save edited post |
-| GET | `/delete/<post_id>` | Yes | Delete post (author only) |
+| POST | `/add` | Yes | Create a new post |
+| GET | `/edit/<post_id>` | Yes | Edit a post (author only) |
+| POST | `/save/<post_id>` | Yes | Save an edited post |
+| GET | `/delete/<post_id>` | Yes | Delete a post (author only) |
 | GET | `/profile/<username>` | No | User profile page |
-| GET/POST | `/profile/edit` | Yes | Edit user profile |
+| GET/POST | `/profile/edit` | Yes | Edit a user profile |
 | GET | `/api/user/<user_id>` | No | User info JSON API |
 | GET | `/health` | No | Health check endpoint |
 
@@ -382,16 +383,16 @@ Flask-Security also provides `/login`, `/logout`, `/register`, and `/confirm` ro
 
 ### Relationships
 
-- **User ↔ Role**: Many-to-many via `roles_users` junction table (CASCADE delete)
-- **User → Post**: One-to-many (`Post.author` backref)
+- **User ↔ Role**: Many-to-many via the `roles_users` junction table (CASCADE delete).
+- **User → Post**: One-to-many (`Post.author` backref).
 
 ## Backup
 
-Automated database backups are handled by `scripts/backup.sh`:
+The script `scripts/backup.sh` creates automated database backups:
 
-- Uses `pg_dump` to create SQL backups
-- Compresses with gzip
-- Auto-deletes backups older than 7 days
+- Uses `pg_dump` to create SQL backups.
+- Compresses the backups with gzip.
+- Deletes backups that are older than 7 days.
 
 Manual backup:
 
@@ -401,12 +402,12 @@ bash scripts/backup.sh
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Run tests to ensure they pass (`pytest`)
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/amazing-feature`).
+3. Run the tests to make sure they pass (`pytest`).
+4. Commit your changes (`git commit -m 'Add amazing feature'`).
+5. Push to the branch (`git push origin feature/amazing-feature`).
+6. Open a Pull Request.
 
 ## License
 

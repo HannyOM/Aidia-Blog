@@ -1,0 +1,14 @@
+Welcome to AIDIA
+
+Hi{% if user.username %} {{ user.username }}{% endif %},
+
+Welcome to AIDIA. Your account has been created successfully.
+{% if confirmation_link %}
+To finish setting up your account, please confirm your email address by opening the link below.
+
+{{ confirmation_link }}
+{% endif %}
+
+We are glad you are here. Happy reading.
+
+You are receiving this email because you have an account with AIDIA.

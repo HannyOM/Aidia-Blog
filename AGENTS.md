@@ -243,39 +243,67 @@ def test_something(client, app, db, create_user, auth):
 
 ---
 
-## Notes for Agents
-- This project uses Docker testcontainers for PostgreSQL during testing
-- The test database is created/destroyed for each test session
-- Flask-Security handles authentication, roles, and password hashing
-- The app uses Blueprint-based architecture for modularity
+## Production Safety & Development Workflow
 
-Agents must follow the workflows defined in the playbooks below.
+This application is live in production on Railway. Protect production at all times.
 
----
+### Branches
+main = production. Never develop directly on main.
+development = integration/staging.
+Use feature/*, fix/*, or similar branches for individual changes.
+Start new work from development.
+feature/* → development → staging/testing → main → production
 
-## Playbooks
+### Rules
+Before changing anything, run:
 
-The following instruction sets must be used depending on the task.
+git status
+git branch --show-current
+git branch -a
+Never modify, reset, delete, force-push, or directly commit to main.
+Never use production as a testing environment.
+Never point local/development/staging code at the production database.
+Never expose, commit, copy, or modify production secrets.
+Never perform destructive production database operations without explicit human approval.
+Test changes locally and, when available, on the staging Railway environment before production.
+Review the final diff, tests, migrations, environment-variable requirements, and potential production risks before declaring a change ready.
+Do not deploy or push to main automatically. Production deployment requires explicit approval from the project owner.
+If the repository contains unexpected uncommitted changes, do not discard them. Stop and ask.
+Never use destructive commands such as:
+git reset --hard
+git clean -fd
+git push --force
 
-Frontend tasks:
-→ ./agent_playbooks/frontend.md
+unless explicitly authorized.
 
-## Mandatory Rule
+### OpenCode Responsibilities
 
-If a task matches a playbook, the agent MUST load and follow that playbook before performing any work.
+OpenCode may:
 
-## Enforcement Rules
+Create development/feature branches.
+Modify code.
+Write and run tests.
+Run migrations in development/staging.
+Commit and push feature/development branches.
+Review changes and report risks.
 
-1. Never start implementing frontend code before loading `agent_playbooks/frontend.md`.
+OpenCode must stop and request human approval for:
 
-2. If a task involves:
-   - Tailwind
-   - HTML templates
-   - UI layout
-   - Flowbite
-   - components
-   - frontend architecture
+Production deployment.
+Pushing/merging to main.
+Production Railway configuration changes.
+Production secrets.
+Destructive production database operations.
+Any irreversible or potentially production-impacting action.
+Production Release
 
-   You MUST follow `agent_playbooks/frontend.md`.
+Before requesting approval, report:
 
-3. If a required playbook exists, it overrides default reasoning.
+Changes:
+Tests:
+Migrations:
+Environment changes:
+Known risks:
+Rollback approach:
+
+When in doubt: stop, explain the risk, and ask before touching production.

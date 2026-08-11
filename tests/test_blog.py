@@ -306,6 +306,7 @@ def test_profile_shows_message_button_for_visitor(client, create_user, create_us
     response = client.get(f"/profile/{username2}")
     assert response.status_code == 200
     assert b">Message</button>" in response.data
+    assert b'data-message-modal-open' in response.data
 
 
 def test_profile_hides_message_button_for_owner(client, create_user, auth):

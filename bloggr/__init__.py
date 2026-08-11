@@ -28,7 +28,12 @@ class ProductionConfig:
     REMEMBER_COOKIE_SECURE = True
     SECURITY_REGISTERABLE = True
     SECURITY_EMAIL_SUBJECT_REGISTER = os.environ.get("SECURITY_EMAIL_SUBJECT_REGISTER")
-    SECURITY_POST_REGISTER_VIEW = "blog.index"
+    SECURITY_POST_REGISTER_VIEW = "blog.check_email"
+    SECURITY_MSG_CONFIRM_REGISTRATION = (
+        "We've emailed a verification link to %(email)s. Please check your inbox"
+        " - and your spam folder just in case - then click the link to confirm your account.",
+        "success",
+    )
     SECURITY_USERNAME_ENABLE = True
     SECURITY_USERNAME_REQUIRED = True
     SECURITY_CONFIRMABLE = True

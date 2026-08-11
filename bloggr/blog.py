@@ -147,6 +147,11 @@ def delete(post_id):
     return redirect(url_for("blog.index"))
 
 
+@bp.route("/check-email")
+def check_email():
+    return render_template("blog/check_email.html")
+
+
 @bp.route("/profile/<username>")
 def profile(username):
     context = _get_profile_context(username)
@@ -197,12 +202,23 @@ def message(username):
     body = form.message.data.strip()
 
     html_body = (
-        f"<p><strong>From:</strong> {html.escape(sender_name)} "
-        f"&lt;<a href=\"mailto:{html.escape(sender_email)}\">{html.escape(sender_email)}</a>&gt;</p>"
-        f"<p><strong>Subject:</strong> {html.escape(subject)}</p>"
-        f"<hr><p>{html.escape(body).replace(chr(10), '<br>')}</p>"
-        f"<p style=\"margin:16px 0 0;color:#8a8a8a;font-size:12px;\">"
-        f"Tip: If this email isn't in your inbox, please check your spam folder.</p>"
+        "<table role=\"presentation\" width=\"100%\" style=\"background-color:#131313;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#e9e9e9\">"
+        "<tr><td align=\"center\" style=\"padding:32px 16px\">"
+        "<table role=\"presentation\" width=\"600\" style=\"width:100%;max-width:600px\">"
+        "<tr><td style=\"background-color:#2d2d2d;border:1px solid #313131;border-radius:24px;padding:36px 32px\">"
+        "<p style=\"margin:0 0 20px 0;color:#3cffd0;font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase\">AIDIA</p>"
+        "<p style=\"margin:0 0 10px 0;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#3cffd0\">New message</p>"
+        f"<h1 style=\"margin:0 0 16px 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.25\">Message from {html.escape(sender_name)}</h1>"
+        f"<p style=\"margin:0 0 6px 0;font-size:13px;color:#949494\">From: <a href=\"mailto:{html.escape(sender_email)}\" style=\"color:#3cffd0;text-decoration:none\">{html.escape(sender_email)}</a></p>"
+        f"<p style=\"margin:0 0 6px 0;font-size:13px;color:#949494\">To: {html.escape(author.username)}</p>"
+        f"<p style=\"margin:0 0 20px 0;font-size:13px;color:#949494\">Subject: {html.escape(subject)}</p>"
+        "<div style=\"height:1px;background-color:#313131;margin:0 0 20px 0\"></div>"
+        f"<p style=\"margin:0 0 24px 0;font-size:16px;line-height:1.6;color:#e9e9e9\">{html.escape(body).replace(chr(10), '<br>')}</p>"
+        "<div style=\"margin-top:8px;padding-top:20px;border-top:1px solid #313131\">"
+        "<p style=\"margin:0;font-size:12px;line-height:18px;color:#949494\">Tip: If this email isn't in your inbox, please check your spam folder. "
+        "To reply, just hit reply - your message will reach the sender.</p>"
+        "</div>"
+        "</td></tr></table></td></tr></table>"
     )
     text_body = (
         f"From: {sender_name} <{sender_email}>\nSubject: {subject}\n\n{body}\n\n"

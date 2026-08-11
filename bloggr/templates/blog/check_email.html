@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "components/navbar.html" import navbar with context %}
+{% from "components/footer.html" import footer %}
+{% from "components/buttons.html" import btn %}
+
+{% block title %}Check your email - AIDIA{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col">
+    {{ navbar('') }}
+
+    <main class="max-w-md mx-auto px-6 md:px-12 py-12 w-full flex-1">
+        <div class="rounded-feature border border-line bg-surface p-8 md:p-10">
+            <div class="text-center mb-8">
+                <p class="font-mono text-xs uppercase tracking-[1.8px] text-accent mb-3">Verify your account</p>
+                <h1 class="font-sans text-3xl font-bold text-ink">Check your email</h1>
+                <p class="mt-2 text-ink2">We've sent a verification link to your inbox.</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="space-y-3 mb-6">
+                {% for category, message in messages %}
+                <div class="px-4 py-3 rounded-[2px] text-sm {{ 'bg-mint text-black' if category == 'success' else 'bg-uv/10 border border-uv/40 text-ink' }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <div class="border border-mint rounded-[20px] p-5 mb-8">
+                <p class="font-mono text-[10px] uppercase tracking-[1.8px] text-accent mb-2">Didn't see it?</p>
+                <p class="text-sm text-ink2">
+                    The email can occasionally land in spam. Check your spam folder and mark it
+                    as not spam if you find it there.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+                {{ btn("Back to homepage", variant="primary", href=url_for('blog.index'), class="w-full") }}
+                {{ btn("Sign in", variant="secondary", href=url_for('security.login'), class="w-full") }}
+            </div>
+        </div>
+    </main>
+
+    {{ footer() }}
+</div>
+{% endblock %}

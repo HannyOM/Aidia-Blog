@@ -201,8 +201,13 @@ def message(username):
         f"&lt;<a href=\"mailto:{html.escape(sender_email)}\">{html.escape(sender_email)}</a>&gt;</p>"
         f"<p><strong>Subject:</strong> {html.escape(subject)}</p>"
         f"<hr><p>{html.escape(body).replace(chr(10), '<br>')}</p>"
+        f"<p style=\"margin:16px 0 0;color:#8a8a8a;font-size:12px;\">"
+        f"Tip: If this email isn't in your inbox, please check your spam folder.</p>"
     )
-    text_body = f"From: {sender_name} <{sender_email}>\nSubject: {subject}\n\n{body}"
+    text_body = (
+        f"From: {sender_name} <{sender_email}>\nSubject: {subject}\n\n{body}\n\n"
+        "Tip: If this email isn't in your inbox, please check your spam folder."
+    )
 
     try:
         email_service.send_email(

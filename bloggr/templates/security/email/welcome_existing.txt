@@ -19,4 +19,6 @@ Your email address is not confirmed yet. To confirm it, open the link below.
 
 If this was not you, you can ignore this email.
 
+Tip: If you don't see this email in your inbox, check your spam folder.
+
 You are receiving this email because you have an account with AIDIA.

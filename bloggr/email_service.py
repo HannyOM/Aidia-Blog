@@ -49,6 +49,7 @@ class ResendMailUtil(MailUtil):
             to=[recipient] if isinstance(recipient, str) else recipient,
             subject=str(subject),
             html=html or body,
+            text=body,
             from_email=formatted_sender,
         )
 

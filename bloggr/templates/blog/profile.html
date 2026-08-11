@@ -32,7 +32,7 @@
                     </div>
                     {% else %}
                     <div class="mt-4">
-                        {{ btn("Message", variant="outline", data_message_modal_open="") }}
+                        {{ btn("Message", variant="outline", **{"data-message-modal-open": ""}) }}
                     </div>
                     {% endif %}
                 </div>

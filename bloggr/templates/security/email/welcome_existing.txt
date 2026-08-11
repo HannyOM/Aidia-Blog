@@ -1,0 +1,22 @@
+Your AIDIA account
+
+Hi{% if user.username %} {{ user.username }}{% endif %},
+
+Someone (you?) tried to register an email that is already in our system.
+{% if user.username %}
+This email is linked to the username {{ user.username }}.
+{% endif %}
+{% if reset_link %}
+To reset your password, open the link below.
+
+{{ reset_link }}
+{% endif %}
+{% if confirmation_link %}
+Your email address is not confirmed yet. To confirm it, open the link below.
+
+{{ confirmation_link }}
+{% endif %}
+
+If this was not you, you can ignore this email.
+
+You are receiving this email because you have an account with AIDIA.

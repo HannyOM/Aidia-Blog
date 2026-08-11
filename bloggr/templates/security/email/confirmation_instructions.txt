@@ -1,0 +1,11 @@
+Confirm your email address
+
+Hi{% if user.username %} {{ user.username }}{% endif %},
+
+Welcome to AIDIA. Click the link below to confirm your email address and activate your account.
+
+{{ confirmation_link }}
+
+If you did not create this account, you can safely ignore this email.
+
+You are receiving this email because you have an account with AIDIA.

@@ -1,0 +1,33 @@
+{# "Welcome existing" email - sent when someone tries to register an email
+   that already has an account (avoids email/username enumeration).
+   Context: user, recovery_link, reset_link, reset_token, confirmation_link,
+   confirmation_token, security.
+#}
+{% from "security/email/_layout.html" import email_layout %}
+{% call email_layout(preheader="Your AIDIA account") %}
+    <h1 style="margin: 0 0 16px 0; font-size: 20px; color: #ffffff;">Your AIDIA account</h1>
+    <p style="margin: 0 0 16px 0; line-height: 1.6;">
+        Hi{% if user.username %} {{ user.username }}{% endif %},
+        someone (you?) tried to register an email that is already in our system.
+    </p>
+    {% if user.username %}
+        <p style="margin: 0 0 16px 0; line-height: 1.6;">
+            This email is linked to the username <strong>{{ user.username }}</strong>.
+        </p>
+    {% endif %}
+    {% if reset_link %}
+        <p style="margin: 0 0 16px 0; line-height: 1.6;">To reset your password, open the link below.</p>
+        <p style="margin: 0 0 24px 0;">
+            <a class="btn" href="{{ reset_link }}">Reset my password</a>
+        </p>
+    {% endif %}
+    {% if confirmation_link %}
+        <p style="margin: 0 0 16px 0; line-height: 1.6;">
+            Your email address is not confirmed yet. To confirm it, open the link below.
+        </p>
+        <p style="margin: 0 0 24px 0;">
+            <a class="btn" href="{{ confirmation_link }}">Confirm my email</a>
+        </p>
+    {% endif %}
+    <p class="muted" style="margin: 0;">If this was not you, you can ignore this email.</p>
+{% endcall %}

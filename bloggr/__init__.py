@@ -41,6 +41,8 @@ class ProductionConfig:
     SECURITY_EMAIL_SENDER = os.environ.get("RESEND_FROM_EMAIL")
     RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
     RESEND_FROM_EMAIL = os.environ.get("RESEND_FROM_EMAIL")
+    MAILBOXLAYER_ACCESS_KEY = os.environ.get("MAILBOXLAYER_ACCESS_KEY")
+    MAILBOXLAYER_API_URL = os.environ.get("MAILBOXLAYER_API_URL")
 
 
 class DevelopmentConfig(ProductionConfig):
@@ -82,8 +84,14 @@ def create_app(config_class=None, test_config=None):
 
     # Setup Flask-Security
     from .email_service import ResendMailUtil
+    from .forms import VerifiedRegisterForm
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security = Security(app, user_datastore, mail_util_cls=ResendMailUtil)
+    security = Security(
+        app,
+        user_datastore,
+        mail_util_cls=ResendMailUtil,
+        register_form=VerifiedRegisterForm,
+    )
 
     # Fix for Flask-Security 5.x: @auth_required() doesn't recognize password
     # authentication as session auth. This sets fs_authn_via in each request

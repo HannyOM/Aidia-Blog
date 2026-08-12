@@ -11,6 +11,7 @@ from flask_login import current_user
 from . import db
 from .models import Post, Comment, Vote
 from .email_service import email_service
+from .quotes import QUOTES
 
 
 bp = Blueprint("blog", __name__)
@@ -30,7 +31,9 @@ class MessageForm(FlaskForm):
 @bp.route("/")
 def index():
     all_posts = Post.query.filter_by(is_published=True).all()
-    return render_template("blog/index.html", all_posts=all_posts, user=current_user)
+    start = date.today().timetuple().tm_yday % len(QUOTES)
+    quotes = QUOTES[start:] + QUOTES[:start]
+    return render_template("blog/index.html", all_posts=all_posts, user=current_user, quotes=quotes)
 
 
 @bp.route("/post/<int:post_id>")

@@ -19,6 +19,20 @@
             <p class="mt-4 font-mono text-xs uppercase tracking-[1.8px] text-ink2">
                 Modern editorial blog — stories from the stream
             </p>
+
+            <div class="quote-rotator max-w-3xl mx-auto mt-10 mb-2"
+                style="display:grid;grid-template-rows:1fr;grid-template-columns:1fr"
+                aria-live="polite">
+                {% for quote, author in quotes %}
+                <figure class="quote-item px-4"
+                    style="grid-row:1;grid-column:1;margin:0;opacity:{{ 1 if loop.first else 0 }};pointer-events:{{ 'auto' if loop.first else 'none' }};transition:opacity 700ms ease;" aria-hidden="{{ 'false' if loop.first else 'true' }}">
+                    <blockquote class="m-0">
+                        <p class="font-serif italic text-xl md:text-2xl text-ink leading-relaxed">“{{ quote }}”</p>
+                        <footer class="mt-3 font-mono text-[11px] uppercase tracking-[1.8px] text-accent">— {{ author }}</footer>
+                    </blockquote>
+                </figure>
+                {% endfor %}
+            </div>
         </div>
     </section>
 
@@ -90,4 +104,27 @@
 
     {{ footer() }}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var items = document.querySelectorAll('.quote-item');
+    var current = 0;
+    if (!items.length) { return; }
+
+    function show(index) {
+        items.forEach(function (item, i) {
+            var active = i === index;
+            item.style.opacity = active ? '1' : '0';
+            item.style.pointerEvents = active ? 'auto' : 'none';
+            item.setAttribute('aria-hidden', active ? 'false' : 'true');
+        });
+    }
+
+    show(current);
+    setInterval(function () {
+        current = (current + 1) % items.length;
+        show(current);
+    }, 5000);
+});
+</script>
 {% endblock %}

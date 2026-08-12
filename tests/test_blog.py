@@ -1,6 +1,7 @@
 import pytest
 from bloggr.models import Post
 from datetime import date
+from bloggr.quotes import QUOTES
 
 
 # Test to see if the index page works.
@@ -9,6 +10,14 @@ def test_index(client, create_user, auth):
     response = client.get("/")
     assert response.status_code == 200
     assert b"Latest Articles" in response.data
+
+
+# Test to see if the homepage renders the rotating quotes.
+def test_index_shows_quote(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"quote-item" in response.data
+    assert QUOTES[0][0].encode() in response.data
 
 
 # Test to see if the app sends the unauthenticated user to the login page.

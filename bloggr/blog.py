@@ -9,7 +9,7 @@ from flask_security.decorators import auth_required, roles_accepted
 from flask_login import current_user
 
 from . import db
-from .models import Post
+from .models import Post, Comment, Vote
 from .email_service import email_service
 
 
@@ -38,7 +38,17 @@ def post(post_id):
     post = db.get_or_404(Post, post_id)
     if not post.is_published and (not current_user.is_authenticated or post.author_id != current_user.id):
         abort(404)
-    return render_template("blog/post.html", post=post, user=current_user)
+    current_vote = None
+    if current_user.is_authenticated:
+        current_vote = Vote.query.filter_by(post_id=post.id, user_id=current_user.id).first()
+    comments = Comment.query.filter_by(post_id=post.id).order_by(Comment.date.desc()).all()
+    return render_template(
+        "blog/post.html",
+        post=post,
+        user=current_user,
+        comments=comments,
+        current_vote=current_vote,
+    )
 
 
 @bp.route("/articles")
@@ -278,3 +288,70 @@ def get_user(user_id):
         "roles": [role.name for role in user.roles],
         "post_count": post_count
     })
+
+
+@bp.route("/post/<int:post_id>/vote", methods=["POST"])
+@auth_required()
+def vote(post_id):
+    post = db.get_or_404(Post, post_id)
+    if not post.is_published:
+        abort(404)
+    if not current_user.is_authenticated:
+        return redirect(url_for("security.login"))
+
+    vote_type = request.form.get("vote_type")
+    if vote_type not in ("like", "dislike"):
+        flash("Invalid vote.", "error")
+        return redirect(url_for("blog.post", post_id=post.id))
+
+    is_like = vote_type == "like"
+    existing_vote = Vote.query.filter_by(post_id=post.id, user_id=current_user.id).first()
+
+    if existing_vote:
+        if existing_vote.is_like == is_like:
+            # Toggle off: clicking the same vote removes it.
+            db.session.delete(existing_vote)
+        else:
+            # Switch from like to dislike or vice versa.
+            existing_vote.is_like = is_like
+    else:
+        db.session.add(Vote(post_id=post.id, user_id=current_user.id, is_like=is_like))
+    db.session.commit()
+
+    return redirect(url_for("blog.post", post_id=post.id))
+
+
+@bp.route("/post/<int:post_id>/comment", methods=["POST"])
+@auth_required()
+def comment(post_id):
+    post = db.get_or_404(Post, post_id)
+    if not post.is_published:
+        abort(404)
+    if not current_user.is_authenticated:
+        return redirect(url_for("security.login"))
+
+    content = request.form.get("content", "").strip()
+    if not content:
+        flash("Your comment is required.", "error")
+    else:
+        db.session.add(Comment(content=content, post_id=post.id, user_id=current_user.id))
+        db.session.commit()
+    return redirect(url_for("blog.post", post_id=post.id))
+
+
+@bp.route("/comment/<int:comment_id>/delete", methods=["POST"])
+@auth_required()
+def delete_comment(comment_id):
+    comment = db.get_or_404(Comment, comment_id)
+    post = comment.post
+    is_post_author = post is not None and post.author_id == current_user.id
+    is_commenter = comment.user_id == current_user.id
+    is_admin = current_user.has_role("admin") if current_user.is_authenticated else False
+    if not (is_post_author or is_commenter or is_admin):
+        abort(403)
+    db.session.delete(comment)
+    db.session.commit()
+    flash("Comment deleted.", "success")
+    if post is not None:
+        return redirect(url_for("blog.post", post_id=post.id))
+    return redirect(url_for("blog.articles"))

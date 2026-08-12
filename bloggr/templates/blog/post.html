@@ -10,6 +10,15 @@
 <div class="min-h-screen flex flex-col">
     {{ navbar('') }}
 
+    <!-- Flash Messages -->
+    {% for message in get_flashed_messages(with_categories=true) %}
+    <div class="max-w-4xl mx-auto px-6 md:px-12 pt-6 w-full">
+        <div class="bg-uv/10 border border-uv/40 text-ink px-4 py-3 rounded-[2px] {% if message[0] == 'error' %}bg-uv/10 border-uv/40{% else %}bg-mint/10 border-mint/40{% endif %}">
+            {{ message[1] }}
+        </div>
+    </div>
+    {% endfor %}
+
     <!-- Article -->
     <article class="max-w-4xl mx-auto px-6 md:px-12 py-12 md:py-16 w-full">
         <!-- Article Header -->
@@ -44,6 +53,101 @@
         <div class="prose prose-lg dark:prose-invert max-w-none">
             {{ post.content|safe }}
         </div>
+
+        <!-- Like / Dislike -->
+        {% if post.is_published %}
+        <div class="mt-10 pt-8 border-t border-line">
+            <div class="flex items-center gap-3">
+                <form action="{{ url_for('blog.vote', post_id=post.id) }}" method="POST">
+                    <input type="hidden" name="vote_type" value="like">
+                    <button type="submit" {% if not user.is_authenticated %}disabled{% endif %}
+                        class="inline-flex items-center gap-2 rounded-[24px] px-5 py-2.5 text-sm font-medium border transition-colors cursor-pointer
+                        {{ 'bg-mint text-black border-mint' if current_vote is not none and current_vote.is_like else 'bg-surface2 text-ink border-line hover:border-accent' }}
+                        {% if not user.is_authenticated and current_vote is none %}opacity-60 cursor-not-allowed{% endif %}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.169 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2l1.5-4.5A3 3 0 0111.4 3h.4a2 2 0 012 2v5z"/>
+                        </svg>
+                        <span>{{ post.like_count }}</span>
+                    </button>
+                </form>
+                <form action="{{ url_for('blog.vote', post_id=post.id) }}" method="POST">
+                    <input type="hidden" name="vote_type" value="dislike">
+                    <button type="submit" {% if not user.is_authenticated %}disabled{% endif %}
+                        class="inline-flex items-center gap-2 rounded-[24px] px-5 py-2.5 text-sm font-medium border transition-colors cursor-pointer
+                        {{ 'bg-uv text-white border-uv' if current_vote is not none and not current_vote.is_like else 'bg-surface2 text-ink border-line hover:border-uv' }}
+                        {% if not user.is_authenticated and current_vote is none %}opacity-60 cursor-not-allowed{% endif %}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.831 3H19a2 2 0 012 2v7a2 2 0 01-2 2h-2l-1.5 4.5A3 3 0 0112.6 21h-.4a2 2 0 01-2-2v-5z"/>
+                        </svg>
+                        <span>{{ post.dislike_count }}</span>
+                    </button>
+                </form>
+                {% if not user.is_authenticated %}
+                <a href="{{ url_for('security.login') }}"
+                    class="font-mono text-[11px] uppercase tracking-[1.5px] text-ink2 hover:text-accent transition-colors">
+                    Log in to like or dislike
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Comments -->
+        {% if post.is_published %}
+        <section class="mt-12 pt-8 border-t border-line">
+            <h2 class="font-sans text-2xl font-bold text-ink mb-6">
+                Comments <span class="font-mono text-sm text-ink2">({{ comments|length }})</span>
+            </h2>
+
+            {% if user.is_authenticated %}
+            <form action="{{ url_for('blog.comment', post_id=post.id) }}" method="POST" class="mb-10">
+                <textarea name="content" rows="4" required
+                    class="w-full rounded-verge border border-line bg-surface2 px-4 py-3 text-ink placeholder-ink2 focus:outline-none focus:border-accent"
+                    placeholder="Share your thoughts..."></textarea>
+                <div class="mt-3">
+                    {{ btn("Post Comment", variant="primary", type="submit") }}
+                </div>
+            </form>
+            {% else %}
+            <p class="mb-10 text-sm text-ink2">
+                <a href="{{ url_for('security.login') }}" class="text-accent hover:text-linkblue transition-colors">Log in</a>
+                to leave a comment.
+            </p>
+            {% endif %}
+
+            {% if comments %}
+            <ul class="space-y-6">
+                {% for comment in comments %}
+                <li class="rounded-verge border border-line bg-surface p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-surface2 border border-line flex items-center justify-center">
+                            <span class="text-xs font-medium text-ink2">{{ comment.user.username[0]|upper }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-ink">{{ comment.user.username }}</p>
+                            <p class="font-mono text-[10px] uppercase tracking-[1.5px] text-ink2">
+                                {{ comment.date.strftime("%B %d, %Y") }}
+                            </p>
+                        </div>
+                        {% if user.is_authenticated and (comment.user_id == user.id or post.author_id == user.id or user.has_role("admin")) %}
+                        <form action="{{ url_for('blog.delete_comment', comment_id=comment.id) }}" method="POST" class="ml-auto">
+                            <button type="submit"
+                                class="font-mono text-[11px] uppercase tracking-[1.5px] text-uv hover:text-uvrule transition-colors cursor-pointer"
+                                onclick="return confirm('Delete this comment?');">
+                                Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    <p class="text-sm text-ink leading-relaxed">{{ comment.content }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-sm text-ink2">No comments yet. Be the first to share your thoughts!</p>
+            {% endif %}
+        </section>
+        {% endif %}
 
         <!-- Article Actions (for author) -->
         {% if user.is_authenticated and post.author_id == user.id %}

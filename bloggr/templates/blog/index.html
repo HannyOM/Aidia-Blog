@@ -51,7 +51,9 @@
                         <p class="text-sm font-medium text-black">{{ featured_post.author.username }}</p>
                     </div>
                 </div>
-                <span class="ml-auto font-mono text-xs uppercase tracking-[1.5px] text-black/70">Read more →</span>
+                <span class="ml-auto font-mono text-xs uppercase tracking-[1.5px] text-black/70">
+                    {{ featured_post.comments|length }} comments · ▲ {{ featured_post.like_count }} · ▼ {{ featured_post.dislike_count }}
+                </span>
             </div>
         </a>
     </section>

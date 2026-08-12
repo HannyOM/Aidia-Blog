@@ -40,7 +40,7 @@ def _enable_verification(app):
 def _disable_email_sending(monkeypatch):
     monkeypatch.setattr(
         "bloggr.email_service.ResendEmailService.send_email",
-        lambda **kwargs: None,
+        lambda self, **kwargs: None,
     )
 
 
@@ -126,7 +126,7 @@ def test_register_rejects_unverifiable_email(app, client, monkeypatch):
     response = client.post(
         "/register",
         data={
-            "email": "fake@nowhere.invalid",
+            "email": "fake@microsoft.com",
             "username": "newuser",
             "password": "Password123!",
             "password_confirm": "Password123!",
@@ -136,7 +136,7 @@ def test_register_rejects_unverifiable_email(app, client, monkeypatch):
     assert response.status_code == 200
     assert b"could not be verified" in response.data
     with app.app_context():
-        assert User.query.filter_by(email="fake@nowhere.invalid").first() is None
+        assert User.query.filter_by(email="fake@microsoft.com").first() is None
 
 
 def test_register_allows_verified_email(app, client, monkeypatch):

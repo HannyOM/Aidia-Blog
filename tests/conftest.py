@@ -27,6 +27,7 @@ def app(postgres_server):
         "WTF_CSRF_ENABLED": False,
         "MAILBOXLAYER_ACCESS_KEY": None,
         "MAILBOXLAYER_API_URL": None,
+        "SECURITY_EMAIL_VALIDATOR_ARGS": {"check_deliverability": False},
     })
 
     with app.app_context():         # Enters the Flask application context.

@@ -11,13 +11,14 @@ AIDIA is a production-ready blog application. It is built with Flask. It provide
 
 - **Blog Publishing** — Create blog posts with a WYSIWYG rich text editor. Edit, delete, and view posts.
 - **Draft/Publish Workflow** — New posts have draft status. Publish a post when it is ready.
-- **User Authentication** — Users can register, log in, and confirm their email. Flask-Security handles authentication.
-- **Role-Based Access Control** — Each new user receives the "editor" role automatically. Admins and editors can manage content.
+- **User Authentication** — Users can register, log in, and confirm their email. Flask-Security handles authentication. After registration, the app tells the user to check their inbox (and spam folder) for the confirmation link.
+- **Role-Based Access Control** — Each new user receives the "editor" role automatically. Editors and admins can manage content.
 - **Author Ownership** — Only the author can edit or delete a post.
-- **User Profiles** — Each user has a public profile page. The page shows the user's post history. Drafts are visible only to the profile owner.
-- **Full-Text Search** — Users can search published post titles and content.
+- **User Profiles** — Each user has a public profile page. The page shows the user's published posts. Drafts are visible only to the profile owner.
+- **Contact Authors** — Visitors can send a message to a user from their profile page. The app emails the message to you.
+- **Keyword Search** — Users can search published post titles and content by keyword.
 - **Rich Text Editor** — The TipTap editor provides bold, italic, underline, headings, lists, blockquotes, links, code, and other formats.
-- **Responsive UI** — The design works on mobile devices. It uses Tailwind CSS and Flowbite.
+- **Responsive UI** — The design works on mobile devices. It uses Tailwind CSS.
 - **Health Check** — The `/health` endpoint reports database connectivity.
 
 ## Tech Stack
@@ -36,14 +37,12 @@ AIDIA is a production-ready blog application. It is built with Flask. It provide
 | Argon2 | Password hashing |
 | Resend | Email service integration |
 | Gunicorn | Production WSGI server |
-| Bleach | HTML sanitization |
 
 ### Frontend
 
 | Technology | Purpose |
 |------------|---------|
 | Tailwind CSS 3.4 | Utility-first CSS framework |
-| Flowbite 2.5 | Tailwind component library |
 | TipTap 2.27 | Rich text editor framework |
 | Vite 5.4 | JavaScript bundler |
 | PostCSS + Autoprefixer | CSS processing |
@@ -80,6 +79,7 @@ flask-production-blog-app/
 ├── tailwind.config.js               # Tailwind CSS config
 ├── railway.json                     # Railway deployment config
 ├── Procfile                         # Heroku-style process definition
+├── wsgi.py                          # WSGI entry point
 └── start.sh                         # Container entrypoint
 ```
 
@@ -153,12 +153,13 @@ flask-production-blog-app/
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `FLASK_ENV` | Yes | `development` or `production` |
+| `FLASK_ENV` | No | Selects the configuration class. Use `development` or `production`. Default: `development` |
 | `SECRET_KEY` | Yes | Flask session secret key |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `SECURITY_PASSWORD_SALT` | Yes | Argon2 password hashing salt |
-| `RESEND_API_KEY` | Yes | Resend.com API key for emails |
-| `RESEND_FROM_EMAIL` | Yes | Verified sender email address |
+| `SECURITY_EMAIL_SUBJECT_REGISTER` | No | Subject line for the registration email |
+| `RESEND_API_KEY` | No | Resend API key. Required only for email features |
+| `RESEND_FROM_EMAIL` | No | Verified sender email address. Required only for email features |
 | `PORT` | No | Port for the production server (default: 8080) |
 
 ### Configuration Classes
@@ -172,10 +173,10 @@ The app selects its configuration class from the environment:
 
 ### User Roles
 
-- **Anonymous users** — Can browse published articles, search, and view public profiles.
+- **Anonymous users** — Can browse published articles, search, view public profiles, and send messages to users.
 - **Registered users** — Receive the "editor" role when they register.
 - **Editors** — Can create, edit, and delete their own posts.
-- **Admins** — Can use all content management features.
+- **Admins** — Can create and publish posts. The author-only rule for editing and deleting applies to them too.
 
 ### Creating Posts
 
@@ -192,6 +193,7 @@ Unpublished posts are visible only to their author.
 - Public profiles are at `/profile/<username>`.
 - The profile shows user information and published posts. It shows drafts only to the profile owner.
 - Edit the profile at `/profile/edit`.
+- Visitors can send a message to the user from the profile page. The app emails the message to the user.
 
 ## Testing
 
@@ -305,11 +307,13 @@ The GitHub Actions workflow is at `.github/workflows/ci-cd.yml`. It provides:
 GET /health
 ```
 
-Returns database connectivity status:
+Returns the database connectivity status:
 
 ```json
-{ "status": "healthy" }
+{ "status": "healthy", "database": "connected" }
 ```
+
+The endpoint returns HTTP 503 with `{"status": "unhealthy"}` when the database is not reachable.
 
 ### User Info API
 
@@ -322,7 +326,7 @@ Returns public user information:
 ```json
 {
   "username": "example_user",
-  "joined": "Jun 04, 2026",
+  "joined": "June 04, 2026",
   "roles": ["editor"],
   "post_count": 5
 }
@@ -337,12 +341,14 @@ Returns public user information:
 | GET | `/articles` | No | All published articles |
 | GET | `/search?q=<query>` | No | Search published posts |
 | GET | `/new` | Yes | New post form |
-| POST | `/add` | Yes | Create a new post |
-| GET | `/edit/<post_id>` | Yes | Edit a post (author only) |
+| POST | `/add` | Yes | Create a new post (GET shows the form) |
+| GET | `/edit/<post_id>` | Yes | Edit a post (author only; POST saves via `/save`) |
 | POST | `/save/<post_id>` | Yes | Save an edited post |
 | GET | `/delete/<post_id>` | Yes | Delete a post (author only) |
 | GET | `/profile/<username>` | No | User profile page |
 | GET/POST | `/profile/edit` | Yes | Edit a user profile |
+| POST | `/message/<username>` | No | Send a message to a user |
+| GET | `/check-email` | No | Confirmation reminder after registration |
 | GET | `/api/user/<user_id>` | No | User info JSON API |
 | GET | `/health` | No | Health check endpoint |
 

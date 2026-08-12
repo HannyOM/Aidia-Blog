@@ -12,6 +12,7 @@ AIDIA is a production-ready blog application. It is built with Flask. It provide
 - **Blog Publishing** — Create blog posts with a WYSIWYG rich text editor. Edit, delete, and view posts.
 - **Draft/Publish Workflow** — New posts have draft status. Publish a post when it is ready.
 - **User Authentication** — Users can register, log in, and confirm their email. Flask-Security handles authentication. After registration, the app tells the user to check their inbox (and spam folder) for the confirmation link.
+- **Email Verification** — The app rejects invalid email addresses at registration. It verifies the address with the Mailboxlayer API before it creates the account.
 - **Role-Based Access Control** — Each new user receives the "editor" role automatically. Editors and admins can manage content.
 - **Author Ownership** — Only the author can edit or delete a post.
 - **User Profiles** — Each user has a public profile page. The page shows the user's published posts. Drafts are visible only to the profile owner.
@@ -36,6 +37,7 @@ AIDIA is a production-ready blog application. It is built with Flask. It provide
 | SQLAlchemy 2.0 | ORM with modern Mapped syntax |
 | Argon2 | Password hashing |
 | Resend | Email service integration |
+| Mailboxlayer | Email verification at registration |
 | Gunicorn | Production WSGI server |
 
 ### Frontend
@@ -124,6 +126,7 @@ flask-production-blog-app/
    SECURITY_PASSWORD_SALT=<your-password-salt>
    RESEND_API_KEY=<your-resend-api-key>
    RESEND_FROM_EMAIL=<your-verified-sender-email>
+   MAILBOXLAYER_ACCESS_KEY=<your-mailboxlayer-api-key>
    ```
 
 5. **Build frontend assets**
@@ -160,6 +163,8 @@ flask-production-blog-app/
 | `SECURITY_EMAIL_SUBJECT_REGISTER` | No | Subject line for the registration email |
 | `RESEND_API_KEY` | No | Resend API key. Required only for email features |
 | `RESEND_FROM_EMAIL` | No | Verified sender email address. Required only for email features |
+| `MAILBOXLAYER_ACCESS_KEY` | No | Mailboxlayer API key. Required only for email verification |
+| `MAILBOXLAYER_API_URL` | No | Mailboxlayer API endpoint. Default: `https://apilayer.net/api/check` |
 | `PORT` | No | Port for the production server (default: 8080) |
 
 ### Configuration Classes

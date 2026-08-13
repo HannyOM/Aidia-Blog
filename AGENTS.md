@@ -15,26 +15,6 @@ Run all tests:
 pytest
 ```
 
-Run a single test file:
-```bash
-pytest tests/test_blog.py
-```
-
-Run a single test function:
-```bash
-pytest tests/test_blog.py::test_index
-```
-
-Run tests with verbose output:
-```bash
-pytest -v
-```
-
-Run tests matching a pattern:
-```bash
-pytest -k "test_login"
-```
-
 ### Development Server
 
 Run the Flask app:
@@ -70,27 +50,6 @@ flask db downgrade
 
 ## Code Style Guidelines
 
-### Imports
-Organize imports in the following order (separate groups with blank lines):
-1. Standard library (`os`, `datetime`, `typing`)
-2. Third-party packages (`flask`, `sqlalchemy`)
-3. Local application modules (`from .models import ...`)
-
-```python
-# Standard library
-from datetime import datetime
-from typing import List
-
-# Third-party
-from flask import Blueprint, render_template
-from flask_security.core import UserMixin, RoleMixin
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-# Local
-from . import db
-from .models import Post
-```
-
 ### Type Annotations
 - Use SQLAlchemy's `Mapped` and `mapped_column` for type-safe column definitions
 - Use `| None` syntax for nullable types (Python 3.10+)
@@ -104,32 +63,6 @@ class Post(db.Model):
     content: Mapped[str] = mapped_column(nullable=False)
     author_id: Mapped[int] = mapped_column(db.ForeignKey("user.id"), nullable=False)
     date: Mapped[datetime] = mapped_column(db.Date, nullable=False)
-```
-
-### Naming Conventions
-- **Variables/functions**: snake_case (`create_app`, `all_posts`)
-- **Classes**: PascalCase (`User`, `Role`, `Post`)
-- **Constants**: UPPER_SNAKE_CASE
-- **Database tables**: singular, lowercase (`user`, `role`, `post`)
-- **Blueprint names**: snake_case (`bp = Blueprint("blog", __name__)`)
-
-### Formatting
-- Use **double quotes** for strings
-- Maximum line length: 100 characters (soft guideline)
-- Use blank lines sparingly to separate logical sections
-- Align assignments with spaces after `=`
-
-```python
-# Good
-app.config.from_mapping(
-    DEBUG = os.environ.get("DEBUG") == "1",
-    SECRET_KEY = os.environ.get("SECRET_KEY"),
-)
-
-# Avoid
-app.config.from_mapping({
-    'DEBUG': os.environ.get("DEBUG") == "1",
-})
 ```
 
 ### Error Handling
@@ -193,54 +126,6 @@ def test_add_post(client, create_user, auth, app):
 - Enable CSRF protection in forms (Flask-WTF handles this)
 - Use proper password hashing (Flask-Security provides this)
 
-### File Organization
-```
-bloggr/
-  __init__.py      # App factory, extensions, blueprint registration
-  models.py        # SQLAlchemy models (User, Role, Post)
-  blog.py          # Blueprint with routes
-  roles.py         # Role initialization signals
-  templates/       # Jinja2 templates
-  static/         # CSS, JS, images
-```
-
----
-
-## Common Patterns
-
-### Application Factory
-```python
-def create_app(test_config=None):
-    app = Flask(__name__)
-    app.config.from_mapping(...)
-    
-    if test_config is not None:
-        app.config.update(test_config)
-    
-    db.init_app(app)
-    # ... initialize other extensions
-    
-    return app
-```
-
-### Model with Relationships
-```python
-class User(db.Model, UserMixin):
-    __tablename__ = "user"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    posts: Mapped[List[Post]] = relationship(backref="author", lazy=True)
-```
-
-### Using Test Fixtures
-```python
-def test_something(client, app, db, create_user, auth):
-    # client: test client for HTTP requests
-    # app: Flask application instance
-    # db: database instance
-    # create_user: creates and returns a test user
-    # auth: helper for login/logout
-```
-
 ---
 
 ## Production Safety & Development Workflow
@@ -249,10 +134,9 @@ This application is live in production on Railway. Protect production at all tim
 
 ### Branches
 main = production. Never develop directly on main.
-development = integration/staging.
 Use feature/*, fix/*, or similar branches for individual changes.
-Start new work from development.
-feature/* → development → staging/testing → main → production
+Start new work from main.
+feature/* → main → production
 
 ### Rules
 Before changing anything, run:
@@ -311,30 +195,30 @@ When in doubt: stop, explain the risk, and ask before touching production.
 
 ---
 
-## Documentation Sync (README.md)
+## Documentation Sync
 
-The README.md file documents the behavior of this application. Keep it accurate. Before you finish any task, run the README relevance check below.
+The README.md and the files in `docs/` document the behavior of this application. Keep them accurate. Before you finish any task, run the relevance check below.
 
-### README Relevance Check
+### Relevance Check
 
-Compare your change against the table below. If your change affects a documented area, update the matching README section in the same change. Use the ASD-STE100 skill for the update. Match the existing README style: active voice, short sentences, and tables.
+Compare your change against the table below. If your change affects a documented area, update the matching file in the same change. Use the ASD-STE100 skill for the update. Match the existing style: active voice, short sentences, and tables.
 
-| Code change | README.md section to update |
+| Code change | File to update |
 |---|---|
-| New or changed feature or behavior | Features, Usage |
-| New or changed route or endpoint | Routes, API Reference |
-| New or changed environment variable | Configuration, Environment Variables |
-| New or changed configuration class | Configuration, Configuration Classes |
-| New or changed dependency | Tech Stack |
-| New or changed model or relationship | Database Models |
-| New or changed file or directory in `bloggr/` | Project Structure |
-| New or changed deployment or CI config | Deployment, CI/CD Pipeline |
-| New or changed test fixture or command | Testing |
-| New or changed script | Backup |
+| New or changed feature or behavior | README.md: Features, Usage |
+| New or changed route or endpoint | `docs/API.md` |
+| New or changed environment variable | README.md: Environment Variables |
+| New or changed configuration class | README.md: Configuration |
+| New or changed dependency | README.md: Tech Stack |
+| New or changed model or relationship | `docs/DATABASE.md` |
+| New or changed file or directory in `bloggr/` | README.md: Project Structure |
+| New or changed deployment, CI, or migration | `docs/DEPLOYMENT.md`, README.md: Deployment |
+| New or changed test fixture or command | README.md: Testing |
+| New or changed script or backup | `docs/DEPLOYMENT.md` |
 
-### No README Change Needed
+### No Documentation Change Needed
 
-A README.md change is not needed for these cases:
+A README.md or `docs/` change is not needed for these cases:
 
 - Pure refactors that do not change behavior.
 - Bug fixes that do not change documented behavior.

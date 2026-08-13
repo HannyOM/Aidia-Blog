@@ -9,7 +9,7 @@ def test_index(client, create_user, auth):
     auth.login()
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Latest Articles" in response.data
+    assert b"Latest Problems" in response.data
 
 
 # Test to see if the homepage renders the rotating quotes.

@@ -86,13 +86,10 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Login to Railway
-        run: railway login --token ${{ secrets.RAILWAY_TOKEN }}
-
       - name: Deploy to Railway
-        run: railway up --environment production
+        run: railway up -y -p 31b3e6bb-3604-435f-9e17-5b526017308f -e production -s 7e90c7e9-c65d-47a0-b16a-b147669368ed
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           SECURITY_PASSWORD_SALT: ${{ secrets.SECURITY_PASSWORD_SALT }}
@@ -104,7 +101,7 @@ jobs:
       - name: Health check
         run: |
           sleep 10
-          URL=$(railway domain -o json)
+          URL=$(railway domain -p 31b3e6bb-3604-435f-9e17-5b526017308f -e production -s 7e90c7e9-c65d-47a0-b16a-b147669368ed)
           curl -f "https://$URL/health" || exit 1
 
   backup:

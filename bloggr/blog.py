@@ -5,11 +5,12 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, Optional
-from flask_security.decorators import auth_required, roles_accepted
+from flask_security.decorators import auth_required
 from flask_login import current_user
 
 from . import db
-from .models import Post, Comment, Vote
+from .models import Post, Comment, Vote, Suggestion, SuggestionVote
+from .constants import INDUSTRIES, COUNTRIES, PROBLEM_STATUSES, STATUS_LABELS
 from .email_service import email_service
 from .quotes import QUOTES
 
@@ -42,15 +43,22 @@ def post(post_id):
     if not post.is_published and (not current_user.is_authenticated or post.author_id != current_user.id):
         abort(404)
     current_vote = None
+    current_suggestion_votes = {}
     if current_user.is_authenticated:
         current_vote = Vote.query.filter_by(post_id=post.id, user_id=current_user.id).first()
+        suggestion_votes = SuggestionVote.query.filter_by(user_id=current_user.id).all()
+        current_suggestion_votes = {sv.suggestion_id: sv for sv in suggestion_votes}
     comments = Comment.query.filter_by(post_id=post.id).order_by(Comment.date.desc()).all()
+    suggestions = Suggestion.query.filter_by(problem_id=post.id).order_by(Suggestion.date.desc()).all()
     return render_template(
         "blog/post.html",
         post=post,
         user=current_user,
         comments=comments,
+        suggestions=suggestions,
         current_vote=current_vote,
+        current_suggestion_votes=current_suggestion_votes,
+        status_labels=STATUS_LABELS,
     )
 
 
@@ -66,7 +74,10 @@ def search():
     if query:
         all_posts = Post.query.filter(
             Post.is_published == True,
-            (Post.title.ilike(f"%{query}%")) | (Post.content.ilike(f"%{query}%"))
+            (Post.title.ilike(f"%{query}%"))
+            | (Post.content.ilike(f"%{query}%"))
+            | (Post.industry.ilike(f"%{query}%"))
+            | (Post.country.ilike(f"%{query}%"))
         ).all()
     else:
         all_posts = []
@@ -75,9 +86,8 @@ def search():
 
 @bp.route("/new", methods=["GET"])
 @auth_required()
-@roles_accepted("admin", "editor")
 def new():
-    return render_template("blog/new.html")
+    return render_template("blog/new.html", industries=INDUSTRIES, countries=COUNTRIES)
 
 
 @bp.route("/add", methods=["GET", "POST"])
@@ -86,6 +96,8 @@ def add():
     if request.method == "POST":
         title = request.form.get("post_title")
         content = request.form.get("post_content")
+        industry = request.form.get("industry", "Other")
+        country = request.form.get("country", "General")
         publish_now = request.form.get("publish_now") == "on"
         error = None
         
@@ -96,19 +108,21 @@ def add():
         
         if error is not None:
             flash(error)
-            return render_template("blog/new.html")
+            return render_template("blog/new.html", industries=INDUSTRIES, countries=COUNTRIES)
         else:
             new_content = Post(
                 title=title,
                 content=content,
                 author_id=current_user.id,
                 date=date.today(),
-                is_published=publish_now
+                is_published=publish_now,
+                industry=industry if industry in INDUSTRIES else "Other",
+                country=country if country in COUNTRIES else "General",
             )
             db.session.add(new_content)
             db.session.commit()
             return redirect(url_for("blog.index"))
-    return render_template("blog/new.html")
+    return render_template("blog/new.html", industries=INDUSTRIES, countries=COUNTRIES)
 
 
 @bp.route("/edit/<int:post_id>", methods=["GET", "POST"])
@@ -117,7 +131,7 @@ def edit(post_id):
     editing_post = db.get_or_404(Post, post_id)
     if editing_post.author_id != current_user.id:
         abort(403)
-    return render_template("blog/edit.html", editing_post=editing_post)
+    return render_template("blog/edit.html", editing_post=editing_post, industries=INDUSTRIES, countries=COUNTRIES)
 
 
 @bp.route("/save/<int:post_id>", methods=["POST"])
@@ -129,6 +143,8 @@ def save(post_id):
     if request.method == "POST":
         new_title = request.form.get("new_post_title")
         new_content = request.form.get("new_post_content")
+        industry = request.form.get("industry", editing_post.industry)
+        country = request.form.get("country", editing_post.country)
         publish_now = request.form.get("publish_now") == "on"
         error = None
 
@@ -139,11 +155,13 @@ def save(post_id):
 
         if error is not None:
             flash(error)
-            return render_template("blog/edit.html", editing_post=editing_post)
+            return render_template("blog/edit.html", editing_post=editing_post, industries=INDUSTRIES, countries=COUNTRIES)
         else:
             editing_post.title = new_title
             editing_post.content = new_content
             editing_post.is_published = publish_now
+            editing_post.industry = industry if industry in INDUSTRIES else editing_post.industry
+            editing_post.country = country if country in COUNTRIES else editing_post.country
             db.session.commit()
     return redirect(url_for("blog.index"))
 
@@ -358,3 +376,82 @@ def delete_comment(comment_id):
     if post is not None:
         return redirect(url_for("blog.post", post_id=post.id))
     return redirect(url_for("blog.articles"))
+
+
+@bp.route("/post/<int:post_id>/suggest", methods=["POST"])
+@auth_required()
+def suggest(post_id):
+    post = db.get_or_404(Post, post_id)
+    if not post.is_published:
+        abort(404)
+
+    content = request.form.get("content", "").strip()
+    if not content:
+        flash("Your solution is required.", "error")
+    else:
+        db.session.add(Suggestion(content=content, problem_id=post.id, user_id=current_user.id))
+        db.session.commit()
+    return redirect(url_for("blog.post", post_id=post.id))
+
+
+@bp.route("/suggestion/<int:suggestion_id>/vote", methods=["POST"])
+@auth_required()
+def suggestion_vote(suggestion_id):
+    suggestion = db.get_or_404(Suggestion, suggestion_id)
+    if not suggestion.post.is_published:
+        abort(404)
+
+    vote_value = request.form.get("vote_value")
+    if vote_value not in ("good", "not_good"):
+        flash("Invalid vote.", "error")
+        return redirect(url_for("blog.post", post_id=suggestion.problem_id))
+
+    is_good = vote_value == "good"
+    existing_vote = SuggestionVote.query.filter_by(
+        suggestion_id=suggestion.id, user_id=current_user.id
+    ).first()
+
+    if existing_vote:
+        if existing_vote.is_good == is_good:
+            db.session.delete(existing_vote)
+        else:
+            existing_vote.is_good = is_good
+    else:
+        db.session.add(
+            SuggestionVote(suggestion_id=suggestion.id, user_id=current_user.id, is_good=is_good)
+        )
+    db.session.commit()
+    return redirect(url_for("blog.post", post_id=suggestion.problem_id))
+
+
+@bp.route("/post/<int:post_id>/status", methods=["POST"])
+@auth_required()
+def update_status(post_id):
+    post = db.get_or_404(Post, post_id)
+    if post.author_id != current_user.id and not current_user.has_role("admin"):
+        abort(403)
+
+    new_status = request.form.get("status")
+    if new_status not in PROBLEM_STATUSES:
+        flash("Invalid status.", "error")
+        return redirect(url_for("blog.post", post_id=post.id))
+
+    post.status = new_status
+    db.session.commit()
+    return redirect(url_for("blog.post", post_id=post.id))
+
+
+@bp.route("/suggestion/<int:suggestion_id>/delete", methods=["POST"])
+@auth_required()
+def delete_suggestion(suggestion_id):
+    suggestion = db.get_or_404(Suggestion, suggestion_id)
+    post = suggestion.post
+    is_problem_author = post is not None and post.author_id == current_user.id
+    is_suggester = suggestion.user_id == current_user.id
+    is_admin = current_user.has_role("admin") if current_user.is_authenticated else False
+    if not (is_problem_author or is_suggester or is_admin):
+        abort(403)
+    db.session.delete(suggestion)
+    db.session.commit()
+    flash("Solution deleted.", "success")
+    return redirect(url_for("blog.post", post_id=post.id))

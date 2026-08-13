@@ -3,19 +3,19 @@
 {% from "components/footer.html" import footer %}
 {% from "components/buttons.html" import btn %}
 
-{% block title %}New Post - AIDIA{% endblock %}
+{% block title %}New Problem - AIDIA{% endblock %}
 
 {% block content %}
 <div class="min-h-screen flex flex-col">
     {{ navbar('') }}
 
-    <!-- New Post Form -->
+    <!-- New Problem Form -->
     <main class="max-w-3xl mx-auto px-6 md:px-12 py-12 w-full flex-1">
         <div class="rounded-feature border border-line bg-surface p-8 md:p-10">
             <div class="mb-8">
-                <p class="font-mono text-xs uppercase tracking-[1.8px] text-accent mb-3">Compose</p>
-                <h1 class="font-sans text-3xl font-bold text-ink">Create New Post</h1>
-                <p class="mt-2 text-ink2">Share your thoughts with the world</p>
+                <p class="font-mono text-xs uppercase tracking-[1.8px] text-accent mb-3">Describe</p>
+                <h1 class="font-sans text-3xl font-bold text-ink">Describe a Problem</h1>
+                <p class="mt-2 text-ink2">Share a real pain point you want solved</p>
             </div>
 
             {% for message in get_flashed_messages() %}
@@ -27,9 +27,30 @@
             <form action="{{ url_for('blog.add') }}" method="post" class="space-y-6">
                 <div>
                     <label for="post_title" class="block text-sm font-medium text-ink2 mb-2">Title</label>
-                    <input type="text" name="post_title" id="post_title" placeholder="Enter post title"
+                    <input type="text" name="post_title" id="post_title" placeholder="Enter problem title"
                         class="w-full px-4 py-3 border border-line rounded-[2px] bg-transparent text-ink placeholder:text-ink2 focus:outline-none focus:border-mint transition-colors"
                         required>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="industry" class="block text-sm font-medium text-ink2 mb-2">Industry</label>
+                        <select name="industry" id="industry"
+                            class="w-full px-4 py-3 border border-line rounded-[2px] bg-surface text-ink focus:outline-none focus:border-mint transition-colors">
+                            {% for industry in industries %}
+                            <option value="{{ industry }}">{{ industry }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-ink2 mb-2">Country</label>
+                        <select name="country" id="country"
+                            class="w-full px-4 py-3 border border-line rounded-[2px] bg-surface text-ink focus:outline-none focus:border-mint transition-colors">
+                            {% for country in countries %}
+                            <option value="{{ country }}">{{ country }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
                 <div>
@@ -110,7 +131,7 @@
                     </label>
                     <div class="flex items-center space-x-4">
                         {{ btn("Cancel", variant="secondary", href=url_for('blog.index')) }}
-                        {{ btn("Save Post", variant="primary", type="submit") }}
+                        {{ btn("Save Problem", variant="primary", type="submit") }}
                     </div>
                 </div>
             </form>

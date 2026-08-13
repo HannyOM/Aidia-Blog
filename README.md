@@ -1,20 +1,21 @@
 # AIDIA
 
-AIDIA is a production-oriented Flask blog application. It provides a rich text editor, role-based access control, user authentication, and a responsive UI.
+AIDIA is a "What to Build" platform. Users describe real problems from any industry and country. The community votes on how serious each problem is. Users propose solutions. The community votes on whether each solution is good.
 
 ## Features
 
-- **Blog Publishing** — Create posts with a rich text editor. Edit, delete, and view posts.
-- **Draft/Publish Workflow** — New posts have draft status. Publish a post when it is ready.
+- **Describe Problems** — Any registered user can describe a problem. They choose an industry and a country.
+- **Severity Voting** — Registered users vote on whether a problem is worth solving. Each user has one vote per problem.
+- **Propose Solutions** — Registered users propose a solution for a problem. A solution can use software, hardware, or both.
+- **Solution Quality Voting** — Registered users vote on whether a solution is good. Each user has one vote per solution.
+- **Problem Status** — The problem author or an admin sets the status: open, in progress, or solved.
+- **Draft/Publish Workflow** — New problems have draft status. Publish a problem when it is ready.
+- **Browse and Search** — Users browse problems. Search matches problem titles, content, industry, and country.
 - **User Authentication** — Users can register, log in, and confirm their email. Flask-Security handles authentication.
 - **Email Verification** — The app verifies email addresses with the Mailboxlayer API at registration.
-- **Role-Based Access Control** — Each new user receives the "editor" role automatically.
-- **Author Ownership** — Only the author can edit or delete a post.
-- **User Profiles** — Public profiles show published posts. Drafts are visible only to the profile owner.
+- **User Profiles** — Public profiles show published problems. Drafts are visible only to the profile owner.
 - **Contact Authors** — Visitors can send a message from a profile page. The app emails the message to the profile owner.
-- **Keyword Search** — Users can search published post titles and content by keyword.
-- **Comments** — Registered users can comment on published posts. The comment author, the post author, or an admin can delete a comment.
-- **Likes and Dislikes** — Registered users can like or dislike a published post. Each user has one vote per post.
+- **Comments** — Registered users can comment on published problems. The comment author, the problem author, or an admin can delete a comment.
 - **Rotating Quotes** — The homepage masthead shows a rotating series of quotes.
 - **Responsive UI** — The design works on mobile devices. It uses Tailwind CSS.
 - **Health Check** — The `/health` endpoint reports database connectivity.
@@ -53,6 +54,7 @@ flask-production-blog-app/
 ├── bloggr/                    # Main application package
 │   ├── __init__.py            # App factory and configuration
 │   ├── models.py              # SQLAlchemy ORM models
+│   ├── constants.py           # Industries, countries, and problem statuses
 │   ├── blog.py                # Blueprint with route handlers
 │   ├── roles.py               # Role assignment signal handlers
 │   ├── email_service.py       # Resend.com email integration
@@ -158,10 +160,10 @@ The app selects its configuration class from the `FLASK_ENV` variable.
 
 | Role | Capabilities |
 |------|--------------|
-| Anonymous | Browse published posts, search, view profiles, view comments and vote counts, and send messages. Must log in to comment or vote. |
-| Registered user | Receives the "editor" role on registration. Can comment on and like or dislike published posts. |
-| Editor | Can create, edit, and delete their own posts. |
-| Admin | Can create and publish posts. The author-only rule for editing and deleting still applies. |
+| Anonymous | Browse published problems, search, view profiles, view comments and vote counts, and send messages. Must log in to comment or vote. |
+| Registered user | Receives the "editor" role on registration. Can describe problems, comment, vote on problem severity, propose solutions, and vote on solution quality. |
+| Editor | Can create, edit, and delete their own problems. Can update the status of their own problems. |
+| Admin | Can update the status of any problem. The author-only rule for editing and deleting still applies. |
 
 ## Testing
 

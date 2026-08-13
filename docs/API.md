@@ -39,23 +39,27 @@ The endpoint returns public user information. It requires no authentication:
 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
-| GET | `/` | No | Homepage with rotating quotes, a featured post, and latest articles |
-| GET | `/post/<post_id>` | No | View a single post |
-| GET | `/articles` | No | All published articles |
-| GET | `/search?q=<query>` | No | Search published posts |
-| GET | `/new` | Yes | New post form (admin or editor) |
-| GET/POST | `/add` | Yes | Create a new post |
-| GET/POST | `/edit/<post_id>` | Yes | Edit a post (author only) |
-| POST | `/save/<post_id>` | Yes | Save an edited post (author only) |
-| GET | `/delete/<post_id>` | Yes | Delete a post (author only) |
+| GET | `/` | No | Homepage with rotating quotes, a featured problem, and latest problems |
+| GET | `/post/<post_id>` | No | View a single problem |
+| GET | `/articles` | No | All published problems |
+| GET | `/search?q=<query>` | No | Search published problems |
+| GET | `/new` | Yes | New problem form (any registered user) |
+| GET/POST | `/add` | Yes | Create a new problem |
+| GET/POST | `/edit/<post_id>` | Yes | Edit a problem (author only) |
+| POST | `/save/<post_id>` | Yes | Save an edited problem (author only) |
+| GET | `/delete/<post_id>` | Yes | Delete a problem (author only) |
 | GET | `/check-email` | No | Confirmation reminder after registration |
 | GET | `/profile/<username>` | No | User profile page |
 | POST | `/message/<username>` | No | Send a message to a user |
 | GET/POST | `/profile/edit` | Yes | Edit a user profile |
 | GET | `/api/user/<user_id>` | No | User info JSON API |
-| POST | `/post/<post_id>/vote` | Yes | Like or dislike a post |
-| POST | `/post/<post_id>/comment` | Yes | Add a comment to a post |
-| POST | `/comment/<comment_id>/delete` | Yes | Delete a comment (comment author, post author, or admin) |
+| POST | `/post/<post_id>/vote` | Yes | Vote on problem severity |
+| POST | `/post/<post_id>/suggest` | Yes | Propose a solution for a problem |
+| POST | `/suggestion/<suggestion_id>/vote` | Yes | Vote on whether a solution is good |
+| POST | `/post/<post_id>/status` | Yes | Update a problem status (problem author or admin) |
+| POST | `/suggestion/<suggestion_id>/delete` | Yes | Delete a suggestion (suggestion author, problem author, or admin) |
+| POST | `/post/<post_id>/comment` | Yes | Add a comment to a problem |
+| POST | `/comment/<comment_id>/delete` | Yes | Delete a comment (comment author, problem author, or admin) |
 | GET | `/health` | No | Health check endpoint |
 
 Flask-Security also provides the `/login`, `/logout`, `/register`, and `/confirm` routes.

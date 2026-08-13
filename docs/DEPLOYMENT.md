@@ -46,7 +46,7 @@ flask db downgrade
 
 ## Backup
 
-The script `scripts/backup.sh` creates automated database backups. It uses `pg_dump` to create SQL backups and gzip to compress them. It deletes backups that are older than 7 days. The script needs the `DATABASE_URL` and `BACKUP_DIR` environment variables.
+The script `scripts/backup.sh` creates automated database backups. It uses `pg_dump` to create SQL backups. It uses gzip to compress them. It deletes backups that are older than 7 days. The script needs the `DATABASE_URL` and `BACKUP_DIR` environment variables. If the local `pg_dump` is older than the database server, the script runs `pg_dump` in a Docker container. The container uses the same PostgreSQL version as the server.
 
 Manual backup:
 

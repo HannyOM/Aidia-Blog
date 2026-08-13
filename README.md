@@ -16,10 +16,13 @@ AIDIA is a production-ready blog application. It is built with Flask. It provide
 - **Role-Based Access Control** — Each new user receives the "editor" role automatically. Editors and admins can manage content.
 - **Author Ownership** — Only the author can edit or delete a post.
 - **User Profiles** — Each user has a public profile page. The page shows the user's published posts. Drafts are visible only to the profile owner.
-- **Contact Authors** — Visitors can send a message to a user from their profile page. The app emails the message to you.
+- **Contact Authors** — Visitors can send a message to a user from their profile page. The app emails the message to the profile owner.
 - **Keyword Search** — Users can search published post titles and content by keyword.
+- **Comments** — Registered users can comment on published posts. The comment author, the post author, and admins can delete a comment.
+- **Likes and Dislikes** — Registered users can like or dislike a published post. Each user has one vote per post. Clicking the same vote again removes it.
 - **Rich Text Editor** — The TipTap editor provides bold, italic, underline, headings, lists, blockquotes, links, code, and other formats.
 - **Responsive UI** — The design works on mobile devices. It uses Tailwind CSS.
+- **Rotating Quotes** — The homepage masthead shows a rotating series of quotes.
 - **Health Check** — The `/health` endpoint reports database connectivity.
 
 ## Tech Stack
@@ -59,6 +62,9 @@ flask-production-blog-app/
 │   ├── blog.py                      # Blueprint with route handlers
 │   ├── roles.py                     # Role assignment signal handlers
 │   ├── email_service.py             # Resend.com email integration
+│   ├── email_verification.py        # Mailboxlayer email verification
+│   ├── forms.py                     # Flask-WTF forms
+│   ├── quotes.py                    # Homepage rotating quotes
 │   ├── templates/                   # Jinja2 HTML templates
 │   │   ├── base.html                # Base layout template
 │   │   ├── blog/                    # Blog page templates
@@ -68,6 +74,8 @@ flask-production-blog-app/
 ├── tests/                           # Test suite
 │   ├── conftest.py                  # Pytest fixtures & helpers
 │   ├── test_blog.py                 # Route & feature tests
+│   ├── test_comments_votes.py       # Comment and vote tests
+│   ├── test_email_verification.py   # Email verification tests
 │   ├── test_models.py               # Model relationship tests
 │   └── test_factory.py              # App factory tests
 ├── migrations/                      # Alembic database migrations
@@ -178,8 +186,8 @@ The app selects its configuration class from the environment:
 
 ### User Roles
 
-- **Anonymous users** — Can browse published articles, search, view public profiles, and send messages to users.
-- **Registered users** — Receive the "editor" role when they register.
+- **Anonymous users** — Can browse published posts, search, view public profiles, view comments and vote counts, and send messages to users. They must log in to comment or vote.
+- **Registered users** — Receive the "editor" role when they register. They can comment on and like or dislike published posts.
 - **Editors** — Can create, edit, and delete their own posts.
 - **Admins** — Can create and publish posts. The author-only rule for editing and deleting applies to them too.
 
@@ -242,6 +250,7 @@ pytest -k "test_login"
 | `app` | Flask application instance |
 | `db` | SQLAlchemy database instance |
 | `create_user` | Creates and returns a test user with the "editor" role |
+| `create_user2` | Creates and returns a second test user with the "editor" role |
 | `auth` | Helper with `.login()` and `.logout()` methods |
 
 ## Database Migrations
@@ -318,7 +327,7 @@ Returns the database connectivity status:
 { "status": "healthy", "database": "connected" }
 ```
 
-The endpoint returns HTTP 503 with `{"status": "unhealthy"}` when the database is not reachable.
+The endpoint returns HTTP 503 with `{"status": "unhealthy", "database": "disconnected"}` when the database is not reachable.
 
 ### User Info API
 
@@ -341,7 +350,7 @@ Returns public user information:
 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
-| GET | `/` | No | Homepage with a featured post and latest articles |
+| GET | `/` | No | Homepage with rotating quotes, a featured post, and latest articles |
 | GET | `/post/<post_id>` | No | View a single post |
 | GET | `/articles` | No | All published articles |
 | GET | `/search?q=<query>` | No | Search published posts |
@@ -353,6 +362,9 @@ Returns public user information:
 | GET | `/profile/<username>` | No | User profile page |
 | GET/POST | `/profile/edit` | Yes | Edit a user profile |
 | POST | `/message/<username>` | No | Send a message to a user |
+| POST | `/post/<post_id>/vote` | Yes | Like or dislike a post |
+| POST | `/post/<post_id>/comment` | Yes | Add a comment to a post |
+| POST | `/comment/<comment_id>/delete` | Yes | Delete a comment (comment author, post author, or admin) |
 | GET | `/check-email` | No | Confirmation reminder after registration |
 | GET | `/api/user/<user_id>` | No | User info JSON API |
 | GET | `/health` | No | Health check endpoint |
@@ -392,10 +404,33 @@ Flask-Security also provides `/login`, `/logout`, `/register`, and `/confirm` ro
 | `date` | Date | Publication date |
 | `is_published` | Boolean | Published status (default: False) |
 
+### Comment
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | Integer | Primary key |
+| `content` | Text | Comment text |
+| `date` | DateTime | Comment timestamp |
+| `post_id` | Integer | Foreign key to Post |
+| `user_id` | Integer | Foreign key to User |
+
+### Vote
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | Integer | Primary key |
+| `post_id` | Integer | Foreign key to Post |
+| `user_id` | Integer | Foreign key to User |
+| `is_like` | Boolean | True for a like. False for a dislike |
+
 ### Relationships
 
 - **User ↔ Role**: Many-to-many via the `roles_users` junction table (CASCADE delete).
 - **User → Post**: One-to-many (`Post.author` backref).
+- **User → Comment**: One-to-many (`Comment.user` backref).
+- **User → Vote**: One-to-many (`Vote.user` backref).
+- **Post → Comment**: One-to-many. Deleting a post deletes its comments.
+- **Post → Vote**: One-to-many. Each user has one vote per post. Deleting a post deletes its votes.
 
 ## Backup
 

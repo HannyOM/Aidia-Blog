@@ -286,6 +286,7 @@ Write and run tests.
 Run migrations in development/staging.
 Commit and push feature/development branches.
 Review changes and report risks.
+Update the README.md file when a change affects documented behavior.
 
 OpenCode must stop and request human approval for:
 
@@ -307,3 +308,37 @@ Known risks:
 Rollback approach:
 
 When in doubt: stop, explain the risk, and ask before touching production.
+
+---
+
+## Documentation Sync (README.md)
+
+The README.md file documents the behavior of this application. Keep it accurate. Before you finish any task, run the README relevance check below.
+
+### README Relevance Check
+
+Compare your change against the table below. If your change affects a documented area, update the matching README section in the same change. Use the ASD-STE100 skill for the update. Match the existing README style: active voice, short sentences, and tables.
+
+| Code change | README.md section to update |
+|---|---|
+| New or changed feature or behavior | Features, Usage |
+| New or changed route or endpoint | Routes, API Reference |
+| New or changed environment variable | Configuration, Environment Variables |
+| New or changed configuration class | Configuration, Configuration Classes |
+| New or changed dependency | Tech Stack |
+| New or changed model or relationship | Database Models |
+| New or changed file or directory in `bloggr/` | Project Structure |
+| New or changed deployment or CI config | Deployment, CI/CD Pipeline |
+| New or changed test fixture or command | Testing |
+| New or changed script | Backup |
+
+### No README Change Needed
+
+A README.md change is not needed for these cases:
+
+- Pure refactors that do not change behavior.
+- Bug fixes that do not change documented behavior.
+- Comments, formatting, or documentation of internal code.
+- Changes that do not affect how the app works.
+
+If you are not sure whether the README.md needs a change, ask the user.

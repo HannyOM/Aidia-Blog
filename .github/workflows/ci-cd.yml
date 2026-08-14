@@ -101,8 +101,7 @@ jobs:
       - name: Health check
         run: |
           sleep 10
-          URL=$(railway domain -p 31b3e6bb-3604-435f-9e17-5b526017308f -e production -s 7e90c7e9-c65d-47a0-b16a-b147669368ed)
-          curl -f "https://$URL/health" || exit 1
+          curl -f "https://aidia.blog/health" || exit 1
 
   backup:
     needs: deploy

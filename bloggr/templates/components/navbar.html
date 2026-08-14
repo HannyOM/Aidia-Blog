@@ -15,7 +15,7 @@
 
             <div class="hidden md:flex items-center gap-7">
                 {{ nav_link('Home', url_for('blog.index'), active, 'home') }}
-                {{ nav_link('Articles', url_for('blog.articles'), active, 'articles') }}
+                {{ nav_link('Problems', url_for('blog.articles'), active, 'articles') }}
 
                 <form action="{{ url_for('blog.search') }}" method="get" class="flex items-center">
                     <input type="text" name="q" placeholder="SEARCH"
@@ -37,7 +37,7 @@
                 </button>
 
                 {% if user.is_authenticated %}
-                {{ btn("New Post", variant="primary", href=url_for('blog.new'), class="px-5 py-2") }}
+                {{ btn("New Problem", variant="primary", href=url_for('blog.new'), class="px-5 py-2") }}
                 {% else %}
                 {{ btn("Login", variant="primary", href=url_for('security.login'), class="px-5 py-2") }}
                 {% endif %}
@@ -70,9 +70,9 @@
             <a href="{{ url_for('blog.index') }}"
                 class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] {{ 'text-accent' if active == 'home' else 'text-ink2 hover:text-accent' }} transition-colors">Home</a>
             <a href="{{ url_for('blog.articles') }}"
-                class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] {{ 'text-accent' if active == 'articles' else 'text-ink2 hover:text-accent' }} transition-colors">Articles</a>
+                class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] {{ 'text-accent' if active == 'articles' else 'text-ink2 hover:text-accent' }} transition-colors">Problems</a>
             {% if user.is_authenticated %}
-            <a href="{{ url_for('blog.new') }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">New Post</a>
+            <a href="{{ url_for('blog.new') }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">New Problem</a>
             <a href="{{ url_for('blog.profile', username=user.username) }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">Profile</a>
             <a href="{{ url_for('security.logout') }}" class="block px-2 py-2 font-mono text-xs uppercase tracking-[1.8px] text-ink2 hover:text-accent transition-colors">Logout</a>
             {% else %}
@@ -81,7 +81,7 @@
             {% endif %}
             <div class="pt-3">
                 {% if user.is_authenticated %}
-                {{ btn("New Post", variant="primary", href=url_for('blog.new'), class="w-full") }}
+                {{ btn("New Problem", variant="primary", href=url_for('blog.new'), class="w-full") }}
                 {% else %}
                 {{ btn("Login", variant="primary", href=url_for('security.login'), class="w-full") }}
                 {% endif %}

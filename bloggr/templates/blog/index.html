@@ -4,7 +4,7 @@
 {% from "components/post_card.html" import story_stream, post_card %}
 {% from "components/buttons.html" import btn %}
 
-{% block title %}AIDIA - Modern Blog{% endblock %}
+{% block title %}AIDIA - What to Build{% endblock %}
 
 {% block content %}
 <div class="min-h-screen flex flex-col">
@@ -17,7 +17,7 @@
                 AIDIA
             </h1>
             <p class="mt-4 font-mono text-xs uppercase tracking-[1.8px] text-ink2">
-                Modern editorial blog — stories from the stream
+                What to build — real problems, ranked by people who live them
             </p>
 
             <div class="quote-rotator max-w-3xl mx-auto mt-10 mb-2"
@@ -38,7 +38,7 @@
 
     {% if all_posts %}
     {% set featured_post = all_posts[0] %}
-    <!-- Featured Feature Card -->
+    <!-- Featured Problem Card -->
     <section class="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-12 w-full">
         <div class="flex items-center gap-4 mb-8">
             <span class="font-mono text-xs uppercase tracking-[1.8px] text-accent">Latest</span>
@@ -47,7 +47,10 @@
         <a href="{{ url_for('blog.post', post_id=featured_post.id) }}"
             class="block rounded-feature bg-mint text-black p-8 md:p-10 hover:brightness-95 transition-all">
             <div class="flex flex-wrap items-center gap-2 mb-6">
-                <span class="font-mono text-[10px] uppercase tracking-[1.8px] font-semibold">Latest Story</span>
+                <span class="font-mono text-[10px] uppercase tracking-[1.8px] font-semibold">Latest Problem</span>
+                <span class="font-mono text-[10px] uppercase tracking-[1.8px] text-black/70">
+                    • {{ featured_post.industry }} • {{ featured_post.country }} • {{ featured_post.status }}
+                </span>
                 <span class="font-mono text-[10px] uppercase tracking-[1.8px] text-black/70">
                     • {{ featured_post.date.strftime("%B %d, %Y") }}
                 </span>
@@ -66,17 +69,17 @@
                     </div>
                 </div>
                 <span class="ml-auto font-mono text-xs uppercase tracking-[1.5px] text-black/70">
-                    {{ featured_post.comments|length }} comments · ▲ {{ featured_post.like_count }} · ▼ {{ featured_post.dislike_count }}
+                    {{ featured_post.comments|length }} comments · {{ featured_post.suggestions|length }} solutions · ▲ {{ featured_post.serious_count }} · ▼ {{ featured_post.trivial_count }}
                 </span>
             </div>
         </a>
     </section>
     {% endif %}
 
-    <!-- Latest Articles + StoryStream -->
+    <!-- Latest Problems + StoryStream -->
     <main class="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-12 w-full">
         <div class="flex items-center justify-between mb-10">
-            <h2 class="font-sans text-2xl md:text-3xl font-bold text-ink">Latest Articles</h2>
+            <h2 class="font-sans text-2xl md:text-3xl font-bold text-ink">Latest Problems</h2>
             {% if all_posts %}
             <a href="{{ url_for('blog.articles') }}"
                 class="font-mono text-[11px] uppercase tracking-[1.5px] text-accent hover:text-linkblue transition-colors">
@@ -91,11 +94,11 @@
         <!-- Empty State -->
         <div class="text-center py-16 rounded-verge border border-line bg-surface">
             <p class="font-mono text-[10px] uppercase tracking-[1.8px] text-accent mb-3">Empty stream</p>
-            <h3 class="text-xl font-bold text-ink">No articles yet</h3>
-            <p class="mt-2 text-ink2">Start by creating your first article!</p>
+            <h3 class="text-xl font-bold text-ink">No problems yet</h3>
+            <p class="mt-2 text-ink2">Start by describing the first problem you want solved!</p>
             {% if user.is_authenticated %}
             <div class="mt-6">
-                {{ btn("Create Article", variant="primary", href=url_for('blog.new')) }}
+                {{ btn("Describe a Problem", variant="primary", href=url_for('blog.new')) }}
             </div>
             {% endif %}
         </div>

@@ -14,8 +14,21 @@ mkdir -p "$BACKUP_DIR"
 
 BACKUP_FILE="$BACKUP_DIR/bloggr_backup_$TIMESTAMP.sql"
 
+run_pg_dump() {
+    local server_major local_major
+    server_major=$(psql "$DATABASE_URL" -tAc "SHOW server_version_num;" 2>/dev/null | head -c 2)
+    local_major=$(pg_dump --version | sed -E 's/.* ([0-9]+).*/\1/')
+
+    if command -v docker >/dev/null 2>&1 && [ -n "$server_major" ] && [ "$local_major" -lt "$server_major" ]; then
+        echo "Local pg_dump ($local_major) is older than server ($server_major); using docker postgres:$server_major"
+        docker run --rm "postgres:$server_major" pg_dump "$DATABASE_URL"
+    else
+        pg_dump "$DATABASE_URL"
+    fi
+}
+
 echo "Starting database backup..."
-pg_dump "$DATABASE_URL" > "$BACKUP_FILE"
+run_pg_dump > "$BACKUP_FILE"
 
 if [ $? -eq 0 ]; then
     echo "Backup created successfully: $BACKUP_FILE"

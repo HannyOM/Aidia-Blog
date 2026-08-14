@@ -98,3 +98,70 @@ def test_editor_posts_relationship(app, db, create_user):         # Ensures exis
                                                                  "My Second Blog Post",
                                                                  "My Third Blog Post"]
 
+
+# Test if problem defaults are applied.
+def test_post_problem_defaults(app, db, create_user):
+    with app.app_context():
+        username, password, user, email, fs_uniquifier = create_user
+        post = Post(
+            title="A Problem",
+            content="Pain point content",
+            author_id=user.id,
+            date=date.today(),
+        )
+        db.session.add(post)
+        db.session.commit()
+        existing_post = Post.query.filter_by(title="A Problem").first()
+        assert existing_post.industry == "Other"
+        assert existing_post.country == "General"
+        assert existing_post.status == "open"
+
+
+# Test if a suggestion can be created and linked to a problem.
+def test_suggestion_relationship(app, db, create_user):
+    from bloggr.models import Suggestion
+    with app.app_context():
+        username, password, user, email, fs_uniquifier = create_user
+        post = Post(
+            title="A Problem",
+            content="Pain point content",
+            author_id=user.id,
+            date=date.today(),
+        )
+        db.session.add(post)
+        db.session.commit()
+        suggestion = Suggestion(content="A proposed solution", problem_id=post.id, user_id=user.id)
+        db.session.add(suggestion)
+        db.session.commit()
+
+        existing_post = Post.query.filter_by(title="A Problem").first()
+        assert len(existing_post.suggestions) == 1
+        assert existing_post.suggestions[0].content == "A proposed solution"
+        assert existing_post.suggestions[0].user_id == user.id
+
+
+# Test if a suggestion vote can be created and counted.
+def test_suggestion_vote_counts(app, db, create_user, create_user2):
+    from bloggr.models import Suggestion, SuggestionVote
+    with app.app_context():
+        username, password, user, email, fs_uniquifier = create_user
+        username2, password2, user2, email2, fs_uniquifier2 = create_user2
+        post = Post(
+            title="A Problem",
+            content="Pain point content",
+            author_id=user.id,
+            date=date.today(),
+        )
+        db.session.add(post)
+        db.session.commit()
+        suggestion = Suggestion(content="A proposed solution", problem_id=post.id, user_id=user.id)
+        db.session.add(suggestion)
+        db.session.commit()
+        db.session.add(SuggestionVote(suggestion_id=suggestion.id, user_id=user.id, is_good=True))
+        db.session.add(SuggestionVote(suggestion_id=suggestion.id, user_id=user2.id, is_good=False))
+        db.session.commit()
+
+        existing_suggestion = Suggestion.query.first()
+        assert existing_suggestion.good_count == 1
+        assert existing_suggestion.not_good_count == 1
+

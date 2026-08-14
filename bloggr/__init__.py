@@ -80,7 +80,7 @@ def create_app(config_class=None, test_config=None):
     email_service.init_app(app)
 
     # Import models to create tables in database.
-    from .models import User, Role, Post
+    from .models import User, Role, Post, Suggestion, SuggestionVote
 
     # Setup Flask-Security
     from .email_service import ResendMailUtil

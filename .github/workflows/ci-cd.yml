@@ -102,19 +102,3 @@ jobs:
         run: |
           sleep 10
           curl -f "https://aidia.blog/health" || exit 1
-
-  backup:
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run database backup
-        run: |
-          chmod +x scripts/backup.sh
-          ./scripts/backup.sh
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          BACKUP_DIR: ${{ secrets.BACKUP_DIR }}

@@ -17,12 +17,11 @@ The `railway.json` file deploys the app with the Nixpacks builder. It configures
 
 ## CI/CD Pipeline
 
-The GitHub Actions workflow is at `.github/workflows/ci-cd.yml`. On every push to `main`, it runs four jobs:
+The GitHub Actions workflow is at `.github/workflows/ci-cd.yml`. On every push to `main`, it runs three jobs:
 
 1. **Test** — Runs pytest against a PostgreSQL 16 service container.
 2. **Build** — Builds a Docker image. Trivy scans the image for HIGH and CRITICAL vulnerabilities.
 3. **Deploy** — Deploys to Railway with the Railway CLI. Verifies the deployment with a health check.
-4. **Backup** — Runs `scripts/backup.sh` to back up the database.
 
 ## Database Migrations
 
@@ -46,7 +45,7 @@ flask db downgrade
 
 ## Backup
 
-The script `scripts/backup.sh` creates automated database backups. It uses `pg_dump` to create SQL backups. It uses gzip to compress them. It deletes backups that are older than 7 days. The script needs the `DATABASE_URL` and `BACKUP_DIR` environment variables. If the local `pg_dump` is older than the database server, the script runs `pg_dump` in a Docker container. The container uses the same PostgreSQL version as the server.
+The script `scripts/backup.sh` creates manual database backups. It uses `pg_dump` to create SQL backups. It uses gzip to compress them. It deletes backups that are older than 7 days. The script needs the `DATABASE_URL` and `BACKUP_DIR` environment variables. If the local `pg_dump` is older than the database server, the script runs `pg_dump` in a Docker container. The container uses the same PostgreSQL version as the server. The `DATABASE_URL` must be reachable from the machine that runs the script.
 
 Manual backup:
 

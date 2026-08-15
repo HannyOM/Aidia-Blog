@@ -1406,6 +1406,10 @@ body {
   z-index: 50;
 }
 
+.m-0 {
+  margin: 0px;
+}
+
 .mx-1 {
   margin-left: 0.25rem;
   margin-right: 0.25rem;
@@ -1464,6 +1468,10 @@ body {
   margin-top: 0.25rem;
 }
 
+.mt-10 {
+  margin-top: 2.5rem;
+}
+
 .mt-12 {
   margin-top: 3rem;
 }
@@ -1476,16 +1484,16 @@ body {
   margin-top: 0.5rem;
 }
 
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
 .mt-4 {
   margin-top: 1rem;
 }
 
 .mt-6 {
   margin-top: 1.5rem;
-}
-
-.mt-8 {
-  margin-top: 2rem;
 }
 
 .line-clamp-2 {
@@ -1520,6 +1528,10 @@ body {
 
 .inline-flex {
   display: inline-flex;
+}
+
+.table {
+  display: table;
 }
 
 .grid {
@@ -1560,6 +1572,10 @@ body {
 
 .h-7 {
   height: 1.75rem;
+}
+
+.h-8 {
+  height: 2rem;
 }
 
 .h-9 {
@@ -1616,6 +1632,10 @@ body {
 
 .w-72 {
   width: 18rem;
+}
+
+.w-8 {
+  width: 2rem;
 }
 
 .w-9 {
@@ -1738,6 +1758,15 @@ body {
   gap: 1.75rem;
 }
 
+.gap-x-3 {
+  -moz-column-gap: 0.75rem;
+       column-gap: 0.75rem;
+}
+
+.gap-y-1 {
+  row-gap: 0.25rem;
+}
+
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.5rem * var(--tw-space-x-reverse));
@@ -1858,6 +1887,10 @@ body {
   border-color: rgb(0 0 0 / 0.2);
 }
 
+.border-black\/30 {
+  border-color: rgb(0 0 0 / 0.3);
+}
+
 .border-line {
   border-color: var(--line);
 }
@@ -1976,6 +2009,10 @@ body {
   padding: 1rem;
 }
 
+.p-5 {
+  padding: 1.25rem;
+}
+
 .p-6 {
   padding: 1.5rem;
 }
@@ -2007,6 +2044,11 @@ body {
 .px-6 {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+}
+
+.py-0\.5 {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
 }
 
 .py-1 {
@@ -2047,6 +2089,11 @@ body {
 .py-3 {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+
+.py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .py-8 {
@@ -2120,6 +2167,10 @@ body {
 
 .font-sans {
   font-family: "Space Grotesk", Helvetica, Arial, sans-serif;
+}
+
+.font-serif {
+  font-family: Newsreader, Georgia, serif;
 }
 
 .text-2xl {
@@ -2199,6 +2250,10 @@ body {
   line-height: 0.95;
 }
 
+.leading-relaxed {
+  line-height: 1.625;
+}
+
 .leading-snug {
   line-height: 1.375;
 }
@@ -2268,6 +2323,14 @@ body {
 
 .underline {
   text-decoration-line: underline;
+}
+
+.placeholder-ink2::-moz-placeholder {
+  color: var(--ink2);
+}
+
+.placeholder-ink2::placeholder {
+  color: var(--ink2);
 }
 
 .accent-mint {
@@ -2341,6 +2404,11 @@ body {
   border-color: var(--accent);
 }
 
+.hover\:border-uv:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(82 0 255 / var(--tw-border-opacity, 1));
+}
+
 .hover\:bg-mint:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(60 255 208 / var(--tw-bg-opacity, 1));
@@ -2388,6 +2456,10 @@ body {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.focus\:border-accent:focus {
+  border-color: var(--accent);
+}
+
 .focus\:border-mint:focus {
   --tw-border-opacity: 1;
   border-color: rgb(60 255 208 / var(--tw-border-opacity, 1));
@@ -2427,6 +2499,10 @@ body {
 }
 
 @media (min-width: 640px) {
+  .sm\:ml-auto {
+    margin-left: auto;
+  }
+
   .sm\:block {
     display: block;
   }
@@ -2442,9 +2518,17 @@ body {
   .sm\:items-center {
     align-items: center;
   }
+
+  .sm\:gap-4 {
+    gap: 1rem;
+  }
 }
 
 @media (min-width: 768px) {
+  .md\:mt-8 {
+    margin-top: 2rem;
+  }
+
   .md\:flex {
     display: flex;
   }
@@ -2469,6 +2553,10 @@ body {
     padding: 2.5rem;
   }
 
+  .md\:p-6 {
+    padding: 1.5rem;
+  }
+
   .md\:p-8 {
     padding: 2rem;
   }
@@ -2476,6 +2564,16 @@ body {
   .md\:px-12 {
     padding-left: 3rem;
     padding-right: 3rem;
+  }
+
+  .md\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .md\:py-10 {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
   }
 
   .md\:py-12 {
@@ -2504,6 +2602,11 @@ body {
     padding-top: 5rem;
   }
 
+  .md\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
   .md\:text-3xl {
     font-size: 1.875rem;
     line-height: 2.25rem;
@@ -2522,6 +2625,15 @@ body {
   .md\:text-8xl {
     font-size: 6rem;
     line-height: 1;
+  }
+
+  .md\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  .md\:leading-tight {
+    line-height: 1.25;
   }
 }
 

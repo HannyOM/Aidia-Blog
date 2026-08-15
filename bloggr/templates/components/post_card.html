@@ -25,8 +25,8 @@
             {{ post.status }}
         </span>
     </div>
-    <div class="flex flex-row items-start pt-4 md:mt-8 pb-4 md:mb-8 {{ 'border-t border-black/20' if featured else 'border-t border-line' }}">
-        <div class="user-card-trigger flex items-center space-x-2 mb-2 order-1" data-user-id="{{ post.author.id }}">
+    <div class="flex flex-col items-start pt-4 md:mt-8 pb-4 md:mb-8 {{ 'border-t border-black/20' if featured else 'border-t border-line' }}">
+        <div class="user-card-trigger flex items-center space-x-2 mb-2" data-user-id="{{ post.author.id }}">
             <div class="w-7 h-7 rounded-full {{ 'bg-black/15' if featured else 'bg-surface2 border border-line' }} flex items-center justify-center">
                 <span class="text-xs font-medium {{ 'text-black' if featured else 'text-ink2' }}">
                     {{ post.author.username[0]|upper }}
@@ -34,7 +34,7 @@
             </div>
             <span class="text-sm {{ 'text-black/80' if featured else 'text-ink2' }}">{{ post.author.username }}</span>
         </div>
-        <div class="flex items-center gap-x-4 font-mono text-[10px] uppercase tracking-[1.5px] {{ 'text-black/70' if featured else 'text-ink2' }} order-2">
+        <div class="flex items-center gap-x-4 font-mono text-[10px] uppercase tracking-[1.5px] {{ 'text-black/70' if featured else 'text-ink2' }}">
             <span>{{ post.comments|length }} comments</span>
             <span>{{ post.suggestions|length }} solutions</span>
             <span>▲ {{ post.serious_count }}</span>

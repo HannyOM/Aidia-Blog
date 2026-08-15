@@ -58,7 +58,7 @@
                 </span>
             </div>
             <h2 class="font-sans text-3xl md:text-5xl font-bold leading-[1.12] md:leading-tight">{{ featured_post.title }}</h2>
-            <p class="mt-4 max-w-3xl text-base leading-relaxed md:text-lg text-black/80">
+            <p class="mt-4 w-full text-base leading-relaxed md:text-lg text-black/80">
                 {{ (featured_post.content|striptags)[:300] }}{% if featured_post.content|length > 300 %}...{% endif %}
             </p>
             <div class="mt-6 flex min-w-0 flex-col items-start gap-4 md:mt-8 md:flex-row md:items-center">

@@ -1,40 +1,50 @@
 {% macro post_card(post, link, featured=False) %}
-<a href="{{ link }}" class="group block rounded-verge border p-6 transition-colors {{ 'bg-mint border-mint text-black' if featured else 'bg-surface border-line hover:border-accent' }}">
+<a href="{{ link }}"
+    class="group block rounded-verge border p-6 transition-colors {{ 'bg-mint border-mint text-black' if featured else 'bg-surface border-line hover:border-accent' }}">
     <div class="flex items-center justify-between mb-3">
-        <span class="font-mono text-[10px] uppercase tracking-[1.8px] {{ 'text-black' if featured else 'text-accent' }}">
+        <span
+            class="font-mono text-[10px] uppercase tracking-[1.8px] {{ 'text-black' if featured else 'text-accent' }}">
             Problem
         </span>
-        <time class="font-mono text-[10px] uppercase tracking-[1.8px] {{ 'text-black/70' if featured else 'text-ink2' }}">
+        <time
+            class="font-mono text-[10px] uppercase tracking-[1.8px] {{ 'text-black/70' if featured else 'text-ink2' }}">
             {{ post.date.strftime("%b %d") }}
         </time>
     </div>
-    <h3 class="text-xl font-bold leading-snug mb-2 {{ 'text-black' if featured else 'text-ink group-hover:text-linkblue' }} transition-colors">
+    <h3
+        class="text-xl font-bold leading-snug mb-2 {{ 'text-black' if featured else 'text-ink group-hover:text-linkblue' }} transition-colors">
         {{ post.title }}
     </h3>
     <p class="line-clamp-2 text-sm {{ 'text-black/80' if featured else 'text-ink2' }}">
         {{ (post.content|striptags)[:150] }}{% if post.content|length > 150 %}...{% endif %}
     </p>
     <div class="flex flex-wrap items-center gap-2 mt-4 mb-4">
-        <span class="font-mono text-[10px] uppercase tracking-[1.5px] px-2 py-0.5 rounded-full border {{ 'border-black/30 text-black/80' if featured else 'border-line text-ink2' }}">
+        <span
+            class="font-mono text-[10px] uppercase tracking-[1.5px] px-2 py-0.5 rounded-full border {{ 'border-black/30 text-black/80' if featured else 'border-line text-ink2' }}">
             {{ post.industry }}
         </span>
-        <span class="font-mono text-[10px] uppercase tracking-[1.5px] px-2 py-0.5 rounded-full border {{ 'border-black/30 text-black/80' if featured else 'border-line text-ink2' }}">
+        <span
+            class="font-mono text-[10px] uppercase tracking-[1.5px] px-2 py-0.5 rounded-full border {{ 'border-black/30 text-black/80' if featured else 'border-line text-ink2' }}">
             {{ post.country }}
         </span>
-        <span class="font-mono text-[10px] uppercase tracking-[1.5px] {{ 'text-black/70' if featured else 'text-ink2' }}">
+        <span
+            class="font-mono text-[10px] uppercase tracking-[1.5px] {{ 'text-black/70' if featured else 'text-ink2' }}">
             {{ post.status }}
         </span>
     </div>
-    <div class="flex flex-col items-start pt-4 md:mt-8 pb-4 md:mb-8 {{ 'border-t border-black/20' if featured else 'border-t border-line' }}">
+    <div
+        class="flex flex-col items-start pt-4 md:mt-0 pb-0 md:mb-0 {{ 'border-t border-black/20' if featured else 'border-t border-line' }}">
         <div class="user-card-trigger flex items-center space-x-2 mb-2" data-user-id="{{ post.author.id }}">
-            <div class="w-7 h-7 rounded-full {{ 'bg-black/15' if featured else 'bg-surface2 border border-line' }} flex items-center justify-center">
+            <div
+                class="w-7 h-7 rounded-full {{ 'bg-black/15' if featured else 'bg-surface2 border border-line' }} flex items-center justify-center">
                 <span class="text-xs font-medium {{ 'text-black' if featured else 'text-ink2' }}">
                     {{ post.author.username[0]|upper }}
                 </span>
             </div>
             <span class="text-sm {{ 'text-black/80' if featured else 'text-ink2' }}">{{ post.author.username }}</span>
         </div>
-        <div class="flex items-center gap-x-4 font-mono text-[10px] uppercase tracking-[1.5px] {{ 'text-black/70' if featured else 'text-ink2' }}">
+        <div
+            class="flex items-center gap-x-4 font-mono text-[10px] uppercase tracking-[1.5px] {{ 'text-black/70' if featured else 'text-ink2' }}">
             <span>{{ post.comments|length }} comments</span>
             <span>{{ post.suggestions|length }} solutions</span>
             <span>▲ {{ post.serious_count }}</span>
@@ -51,11 +61,13 @@
         {% for post in posts %}
         <div class="relative flex">
             <div class="hidden sm:block w-16 shrink-0 pr-4 pt-6 text-right">
-                <time class="font-mono text-[10px] uppercase tracking-[1.5px] text-ink2">{{ post.date.strftime("%b %d") }}</time>
+                <time class="font-mono text-[10px] uppercase tracking-[1.5px] text-ink2">{{ post.date.strftime("%b %d")
+                    }}</time>
             </div>
             <div class="flex-1 min-w-0">
                 <div class="sm:hidden mb-1">
-                    <time class="font-mono text-[10px] uppercase tracking-[1.5px] text-ink2">{{ post.date.strftime("%b %d") }}</time>
+                    <time class="font-mono text-[10px] uppercase tracking-[1.5px] text-ink2">{{ post.date.strftime("%b
+                        %d") }}</time>
                 </div>
                 {{ post_card(post, url_for('blog.post', post_id=post.id)) }}
             </div>

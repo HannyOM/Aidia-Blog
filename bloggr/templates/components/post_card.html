@@ -14,7 +14,7 @@
     <p class="line-clamp-2 text-sm {{ 'text-black/80' if featured else 'text-ink2' }}">
         {{ (post.content|striptags)[:150] }}{% if post.content|length > 150 %}...{% endif %}
     </p>
-    <div class="flex flex-wrap items-center gap-2 mt-4">
+    <div class="flex flex-wrap items-center gap-2 mt-4 mb-4">
         <span class="font-mono text-[10px] uppercase tracking-[1.5px] px-2 py-0.5 rounded-full border {{ 'border-black/30 text-black/80' if featured else 'border-line text-ink2' }}">
             {{ post.industry }}
         </span>
